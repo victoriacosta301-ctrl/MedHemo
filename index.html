@@ -1,1 +1,1647 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HemoLab — Sistema de Gestão</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green-50: #EAF3DE;
+    --green-100: #C0DD97;
+    --green-200: #97C459;
+    --green-400: #639922;
+    --green-600: #3B6D11;
+    --green-800: #27500A;
+    --white: #ffffff;
+    --gray-50: #F7F8F5;
+    --gray-100: #EDEFE9;
+    --gray-200: #D6D9CE;
+    --gray-400: #8A9080;
+    --gray-600: #5A6050;
+    --gray-800: #2C3020;
+    --red-100: #FDECEA;
+    --red-400: #E24B4A;
+    --red-600: #A32D2D;
+    --blue-50: #E6F1FB;
+    --blue-400: #378ADD;
+    --blue-600: #185FA5;
+    --amber-50: #FAEEDA;
+    --amber-400: #BA7517;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,0.10);
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--gray-50); color: var(--gray-800); min-height: 100vh; }
+
+  /* LOGIN */
+  .login-page { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: linear-gradient(135deg, #f0f7e8 0%, #e8f5f0 50%, #ffffff 100%); }
+  .login-card { background: white; border-radius: var(--radius-lg); padding: 48px 40px; width: 420px; box-shadow: var(--shadow-lg); }
+  .login-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 32px; }
+  .login-logo-icon { display: flex; align-items: center; justify-content: center; }
+  .login-logo-img { height: 64px; width: auto; object-fit: contain; }
+  .login-logo-text { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--gray-800); }
+  .login-logo-sub { font-size: 11px; color: var(--gray-400); letter-spacing: 0.06em; text-transform: uppercase; }
+  .login-title { font-size: 24px; font-weight: 600; color: var(--gray-800); margin-bottom: 6px; }
+  .login-sub { font-size: 14px; color: var(--gray-400); margin-bottom: 28px; }
+  .form-group { margin-bottom: 16px; }
+  .form-label { display: block; font-size: 13px; font-weight: 500; color: var(--gray-600); margin-bottom: 6px; }
+  .form-input { width: 100%; padding: 10px 14px; border: 1.5px solid var(--gray-200); border-radius: var(--radius-sm); font-size: 14px; font-family: 'DM Sans', sans-serif; outline: none; transition: border 0.2s; color: var(--gray-800); background: white; }
+  .form-input:focus { border-color: var(--green-400); }
+  .form-select { width: 100%; padding: 10px 14px; border: 1.5px solid var(--gray-200); border-radius: var(--radius-sm); font-size: 14px; font-family: 'DM Sans', sans-serif; outline: none; transition: border 0.2s; color: var(--gray-800); background: white; cursor: pointer; }
+  .form-select:focus { border-color: var(--green-400); }
+  .btn-primary { width: 100%; padding: 12px; background: var(--green-400); color: white; border: none; border-radius: var(--radius-sm); font-size: 15px; font-weight: 500; font-family: 'DM Sans', sans-serif; cursor: pointer; transition: background 0.2s; }
+  .btn-primary:hover { background: var(--green-600); }
+  .login-hint { text-align: center; font-size: 12px; color: var(--gray-400); margin-top: 20px; line-height: 1.7; }
+
+  /* LAYOUT */
+  .app-layout { display: flex; min-height: 100vh; }
+  .sidebar { width: 240px; background: white; border-right: 1px solid var(--gray-100); display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 100; }
+  .sidebar-logo { padding: 20px 18px 16px; border-bottom: 1px solid var(--gray-100); display: flex; align-items: center; gap: 10px; }
+  .sidebar-logo-icon { width: 36px; height: 36px; background: var(--green-400); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .sidebar-logo-icon svg { fill: white; width: 20px; height: 20px; }
+  .sidebar-logo-text { font-family: 'DM Serif Display', serif; font-size: 17px; color: var(--gray-800); }
+  .sidebar-nav { flex: 1; padding: 12px 10px; overflow-y: auto; }
+  .nav-section-label { font-size: 10px; font-weight: 600; color: var(--gray-400); letter-spacing: 0.08em; text-transform: uppercase; padding: 12px 8px 6px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: var(--radius-sm); cursor: pointer; font-size: 14px; color: var(--gray-600); transition: all 0.15s; margin-bottom: 2px; }
+  .nav-item:hover { background: var(--gray-50); color: var(--gray-800); }
+  .nav-item.active { background: var(--green-50); color: var(--green-600); font-weight: 500; }
+  .nav-item svg { width: 17px; height: 17px; flex-shrink: 0; }
+  .sidebar-user { padding: 14px 16px; border-top: 1px solid var(--gray-100); }
+  .user-info { display: flex; align-items: center; gap: 10px; }
+  .user-avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--green-100); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: var(--green-600); flex-shrink: 0; }
+  .user-name { font-size: 13px; font-weight: 500; color: var(--gray-800); }
+  .user-role { font-size: 11px; color: var(--gray-400); }
+  .btn-logout { margin-top: 8px; width: 100%; padding: 7px; background: none; border: 1px solid var(--gray-200); border-radius: var(--radius-sm); font-size: 12px; color: var(--gray-400); cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
+  .btn-logout:hover { border-color: var(--red-400); color: var(--red-400); background: var(--red-100); }
+  .main-content { margin-left: 240px; flex: 1; padding: 28px 32px; min-height: 100vh; }
+  .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+  .page-title { font-size: 22px; font-weight: 600; color: var(--gray-800); }
+  .page-sub { font-size: 14px; color: var(--gray-400); margin-top: 2px; }
+
+  /* CARDS & TABLES */
+  .card { background: white; border-radius: var(--radius-lg); border: 1px solid var(--gray-100); padding: 20px 24px; box-shadow: var(--shadow-sm); }
+  .card-title { font-size: 15px; font-weight: 600; color: var(--gray-800); margin-bottom: 16px; }
+  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
+  .stat-card { background: white; border-radius: var(--radius-md); border: 1px solid var(--gray-100); padding: 16px 18px; box-shadow: var(--shadow-sm); }
+  .stat-label { font-size: 12px; color: var(--gray-400); font-weight: 500; letter-spacing: 0.02em; margin-bottom: 6px; }
+  .stat-value { font-size: 26px; font-weight: 600; color: var(--gray-800); }
+  .stat-sub { font-size: 12px; color: var(--green-400); margin-top: 2px; }
+  .data-table { width: 100%; border-collapse: collapse; }
+  .data-table th { font-size: 11px; font-weight: 600; color: var(--gray-400); text-transform: uppercase; letter-spacing: 0.06em; padding: 8px 12px; border-bottom: 1px solid var(--gray-100); text-align: left; }
+  .data-table td { padding: 11px 12px; font-size: 14px; color: var(--gray-800); border-bottom: 1px solid var(--gray-50); }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tr:hover td { background: var(--gray-50); }
+  .badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 500; }
+  .badge-green { background: var(--green-50); color: var(--green-600); }
+  .badge-gray { background: var(--gray-100); color: var(--gray-600); }
+  .badge-blue { background: var(--blue-50); color: var(--blue-600); }
+  .badge-red { background: var(--red-100); color: var(--red-600); }
+  .badge-amber { background: var(--amber-50); color: var(--amber-400); }
+  .btn { padding: 8px 16px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all 0.15s; border: none; }
+  .btn-green { background: var(--green-400); color: white; }
+  .btn-green:hover { background: var(--green-600); }
+  .btn-outline { background: white; border: 1.5px solid var(--gray-200); color: var(--gray-600); }
+  .btn-outline:hover { border-color: var(--gray-400); color: var(--gray-800); }
+  .btn-sm { padding: 5px 11px; font-size: 12px; }
+  .btn-red { background: var(--red-100); color: var(--red-600); border: 1px solid transparent; }
+  .btn-red:hover { background: var(--red-400); color: white; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .flex-row { display: flex; align-items: center; gap: 10px; }
+  .flex-wrap { display: flex; flex-wrap: wrap; gap: 10px; }
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 1000; display: flex; align-items: center; justify-content: center; }
+  .modal { background: white; border-radius: var(--radius-lg); padding: 28px 32px; width: 560px; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-lg); }
+  .modal-title { font-size: 18px; font-weight: 600; margin-bottom: 20px; }
+  .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--gray-100); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .form-group-inline { margin-bottom: 14px; }
+  .section-divider { border: none; border-top: 1px solid var(--gray-100); margin: 20px 0; }
+  .week-grid { display: grid; grid-template-columns: 60px repeat(7, 1fr); border: 1px solid var(--gray-100); border-radius: var(--radius-md); overflow: hidden; }
+  .week-header { background: var(--green-50); padding: 8px; font-size: 12px; font-weight: 600; color: var(--green-600); text-align: center; border-bottom: 1px solid var(--gray-100); }
+  .week-time { background: var(--gray-50); padding: 6px 8px; font-size: 11px; color: var(--gray-400); text-align: right; border-right: 1px solid var(--gray-100); border-bottom: 1px solid var(--gray-100); }
+  .week-cell { padding: 4px; border-right: 1px solid var(--gray-100); border-bottom: 1px solid var(--gray-100); min-height: 44px; }
+  .week-event { background: var(--green-50); border-left: 3px solid var(--green-400); border-radius: 4px; padding: 3px 6px; font-size: 11px; color: var(--green-600); margin-bottom: 2px; cursor: pointer; }
+  .week-event:hover { background: var(--green-100); }
+  .tag { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; background: var(--green-50); color: var(--green-600); border-radius: 20px; font-size: 12px; }
+  .tag-remove { cursor: pointer; color: var(--green-400); font-size: 14px; line-height: 1; }
+  .avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--green-100); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: var(--green-600); flex-shrink: 0; }
+  .caixa-card { background: white; border-radius: var(--radius-lg); border: 1px solid var(--gray-100); padding: 20px 24px; }
+  .caixa-total { font-size: 36px; font-weight: 600; color: var(--green-400); }
+  .page { display: none; }
+  .page.active { display: block; }
+  .search-input { padding: 8px 14px 8px 36px; border: 1.5px solid var(--gray-200); border-radius: var(--radius-sm); font-size: 13px; font-family: 'DM Sans', sans-serif; outline: none; width: 240px; color: var(--gray-800); background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%238A9080' viewBox='0 0 24 24'%3E%3Cpath d='M10 2a8 8 0 105.293 14.207l4.25 4.25a1 1 0 001.414-1.414l-4.25-4.25A8 8 0 0010 2zm0 2a6 6 0 110 12A6 6 0 0110 4z'/%3E%3C/svg%3E") no-repeat 12px center; }
+  .search-input:focus { border-color: var(--green-400); }
+  .empty-state { text-align: center; padding: 48px 20px; color: var(--gray-400); }
+  .empty-state svg { width: 48px; height: 48px; fill: var(--gray-200); margin-bottom: 12px; }
+  .empty-state p { font-size: 15px; }
+  .prontuario-section { margin-bottom: 20px; }
+  .prontuario-section-title { font-size: 13px; font-weight: 600; color: var(--gray-600); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+  .financeiro-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--gray-50); }
+  .financeiro-row:last-child { border-bottom: none; }
+  .alert { padding: 10px 14px; border-radius: var(--radius-sm); font-size: 13px; margin-bottom: 14px; }
+  .alert-success { background: var(--green-50); color: var(--green-600); border: 1px solid var(--green-100); }
+  .alert-error { background: var(--red-100); color: var(--red-600); border: 1px solid #f7c1c1; }
+  .tab-bar { display: flex; gap: 2px; background: var(--gray-100); padding: 4px; border-radius: var(--radius-sm); margin-bottom: 20px; width: fit-content; }
+  .tab-btn { padding: 6px 14px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; border: none; background: none; color: var(--gray-400); font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
+  .tab-btn.active { background: white; color: var(--green-600); box-shadow: var(--shadow-sm); }
+</style>
+</head>
+<body>
+
+<div id="app"></div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ===== SUPABASE CONFIG =====
+const SUPABASE_URL = 'https://upktoqruejofodfoxzlp.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVwa3RvcXJ1ZWpvZm9kZm94emxwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyMTUzNzEsImV4cCI6MjA5Mzc5MTM3MX0.JoFjBb3y4rR6k8YStAB1s0ji-nRN_Rd37Ji7P5vRzp4';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ===== STATE =====
+const STATE = {
+  currentUser: null,
+  currentPage: 'dashboard',
+  currentUnidade: null,
+  modalOpen: null,
+  unidades: [],
+  // Data — preenchido pelo Supabase via dbLoad()
+  users: [],
+  medicos: [],
+  pacientes: [],
+  agendamentos: [],
+  prontuarios: [],
+  caixas: [],
+  nextId: { users: 4, medicos: 4, pacientes: 4, agendamentos: 5, prontuarios: 2, caixas: 2 },
+  caixaAtual: null,
+  searchTerms: {},
+  editItem: null,
+  activeTab: {},
+};
+
+// (config já definida acima)
+// const SUPABASE_URL = 'https://upktoqruejofodfoxzlp.supabase.co';
+// const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVwa3RvcXJ1ZWpvZm9kZm94emxwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyMTUzNzEsImV4cCI6MjA5Mzc5MTM3MX0.JoFjBb3y4rR6k8YStAB1s0ji-nRN_Rd37Ji7P5vRzp4';
+// sb já definido acima
+
+// ===== DB HELPERS =====
+async function dbLoad() {
+  try {
+    const [us, med, pac, ag, pr, cx, un] = await Promise.all([
+      sb.from('usuarios').select('*'),
+      sb.from('medicos').select('*'),
+      sb.from('pacientes').select('*'),
+      sb.from('agendamentos').select('*'),
+      sb.from('prontuarios').select('*'),
+      sb.from('caixas').select('*'),
+      sb.from('unidades').select('*'),
+    ]);
+    if (us.data?.length)  STATE.users        = us.data.map(mapUser);
+    if (med.data?.length) STATE.medicos      = med.data.map(mapMedico);
+    if (pac.data?.length) STATE.pacientes    = pac.data.map(mapPaciente);
+    if (ag.data?.length)  STATE.agendamentos = ag.data.map(mapAg);
+    if (pr.data?.length)  STATE.prontuarios  = pr.data.map(mapPront);
+    if (cx.data?.length)  STATE.caixas       = cx.data.map(mapCaixa);
+    if (un.data?.length)  STATE.unidades     = un.data.map(mapUnidade);
+    else STATE.unidades = [
+      { id: 1, nome: 'Posto Central', endereco: '', ativo: true },
+      { id: 2, nome: 'Posto Filial',  endereco: '', ativo: true },
+    ];
+  } catch(e) {
+    console.warn('Supabase offline, usando dados locais', e);
+    STATE.unidades = [
+      { id: 1, nome: 'Posto Central', endereco: '', ativo: true },
+      { id: 2, nome: 'Posto Filial',  endereco: '', ativo: true },
+    ];
+  }
+}
+
+function mapUnidade(r) { return { id: r.id, nome: r.nome, endereco: r.endereco||'', ativo: r.ativo }; }
+function mapUser(r)    { return { id:r.id, nome:r.nome, email:r.email, senha:r.senha, perfil:r.perfil, ativo:r.ativo, unidades: r.unidades || [] }; }
+
+function mapMedico(r)  { return { id:r.id, nome:r.nome, crm:r.crm, especialidade:r.especialidade, telefone:r.telefone, email:r.email, cor:r.cor||'#639922', exigencias:r.exigencias||[] }; }
+function mapPaciente(r){ return { id:r.id, nome:r.nome, telefone:r.telefone, cpf:r.cpf||'', dataNasc:r.data_nasc||'', email:r.email||'', convenio:r.convenio||'', plano:r.plano||'' }; }
+function mapAg(r)      { return { id:r.id, pacienteId:r.paciente_id, medicoId:r.medico_id, colaboradorId:r.colaborador_id, data:r.data, hora:r.hora?.slice(0,5), tipo:r.tipo, status:r.status, valor:parseFloat(r.valor), pago:r.pago, unidadeId:r.unidade_id }; }
+function mapPront(r)   { return { id:r.id, pacienteId:r.paciente_id, medicoId:r.medico_id, data:r.data, queixa:r.queixa||'', historico:r.historico||'', exame:r.exame||'', hipotese:r.hipotese||'', conduta:r.conduta||'', campos:r.campos||[] }; }
+function mapCaixa(r)   { return { id:r.id, data:r.data, colaboradorId:r.colaborador_id, itens:r.itens||[], total:parseFloat(r.total||0), fechado:r.fechado, unidadeId:r.unidade_id }; }
+
+async function dbSaveUser(obj) {
+  const row = { nome:obj.nome, email:obj.email, senha:obj.senha, perfil:obj.perfil, ativo:obj.ativo, unidades:obj.unidades||[] };
+  if (obj.id && obj.id < 10000) { await sb.from('usuarios').update(row).eq('id', obj.id); }
+  else { const {data} = await sb.from('usuarios').insert(row).select(); if(data?.[0]) obj.id = data[0].id; }
+}
+async function dbSaveMedico(obj) {
+  const row = { nome:obj.nome, crm:obj.crm, especialidade:obj.especialidade, telefone:obj.telefone, email:obj.email, cor:obj.cor, exigencias:obj.exigencias };
+  if (obj._dbId) {
+    await sb.from('medicos').update(row).eq('id', obj._dbId);
+  } else {
+    const {data, error} = await sb.from('medicos').insert(row).select();
+    if (data?.[0]) { obj.id = data[0].id; obj._dbId = data[0].id; }
+    if (error) console.error('Erro ao salvar médico:', error);
+  }
+}
+async function dbSavePaciente(obj) {
+  const row = { nome:obj.nome, telefone:obj.telefone, cpf:obj.cpf||'', data_nasc:obj.dataNasc||null, email:obj.email||'', convenio:obj.convenio||'', plano:obj.plano||'' };
+  if (obj._dbId) {
+    await sb.from('pacientes').update(row).eq('id', obj._dbId);
+  } else {
+    const {data, error} = await sb.from('pacientes').insert(row).select();
+    if (data?.[0]) { obj.id = data[0].id; obj._dbId = data[0].id; }
+    if (error) console.error('Erro ao salvar paciente:', error);
+  }
+  return obj;
+}
+async function dbSaveAg(obj) {
+  const row = { paciente_id:obj.pacienteId, medico_id:obj.medicoId, colaborador_id:obj.colaboradorId, data:obj.data, hora:obj.hora, tipo:obj.tipo, status:obj.status, valor:obj.valor, pago:obj.pago, unidade_id:obj.unidadeId };
+  if (obj._dbId) {
+    await sb.from('agendamentos').update(row).eq('id', obj._dbId);
+  } else {
+    const {data, error} = await sb.from('agendamentos').insert(row).select();
+    if (data?.[0]) { obj.id = data[0].id; obj._dbId = data[0].id; }
+    if (error) console.error('Erro ao salvar agendamento:', error);
+  }
+}
+async function dbSavePront(obj) {
+  const row = { paciente_id:obj.pacienteId, medico_id:obj.medicoId, data:obj.data, queixa:obj.queixa, historico:obj.historico, exame:obj.exame, hipotese:obj.hipotese, conduta:obj.conduta, campos:obj.campos };
+  const {data} = await sb.from('prontuarios').insert(row).select(); if(data?.[0]) obj.id = data[0].id;
+}
+async function dbSaveCaixa(obj) {
+  const row = { data:obj.data, colaborador_id:obj.colaboradorId, itens:obj.itens, total:obj.total, fechado:obj.fechado, unidade_id:obj.unidadeId };
+  if (obj._dbId) { await sb.from('caixas').update(row).eq('id', obj._dbId); }
+  else { const {data} = await sb.from('caixas').insert(row).select(); if(data?.[0]) { obj.id = data[0].id; obj._dbId = data[0].id; } }
+}
+async function dbUpdateAg(id, fields) {
+  const map = {};
+  if (fields.pago !== undefined) map.pago = fields.pago;
+  if (fields.status !== undefined) map.status = fields.status;
+  await sb.from('agendamentos').update(map).eq('id', id);
+}
+
+// ===== HELPERS =====
+function getId(type) { return STATE.nextId[type]++; }
+function fmtDate(d) { if (!d) return ''; const [y,m,dd] = d.split('-'); return `${dd}/${m}/${y}`; }
+function fmtCurrency(v) { return 'R$ ' + parseFloat(v||0).toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
+function getMedico(id) { return STATE.medicos.find(m => m.id === id) || {}; }
+function getPaciente(id) { return STATE.pacientes.find(p => p.id === id) || {}; }
+function getUser(id) { return STATE.users.find(u => u.id === id) || {}; }
+function perfilLabel(p) { return {supervisor:'Supervisor', supervisor_financeiro:'Sup. Financeiro', colaborador:'Colaborador'}[p] || p; }
+function canAccess(page) {
+  const u = STATE.currentUser;
+  if (!u) return false;
+  if (u.perfil === 'supervisor') return true; // acesso total incluindo 'unidades'
+  if (u.perfil === 'supervisor_financeiro') return ['dashboard','financeiro','caixas'].includes(page);
+  if (u.perfil === 'colaborador') return ['dashboard','agenda','agendamento','prontuarios'].includes(page);
+  return false;
+}
+function diaSemana(d) { const dias = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb']; return dias[new Date(d+'T12:00:00').getDay()]; }
+function weekDays() {
+  const today = new Date('2025-04-07');
+  const days = [];
+  const start = new Date(today);
+  start.setDate(today.getDate() - today.getDay());
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(start);
+    d.setDate(start.getDate() + i);
+    days.push(d.toISOString().split('T')[0]);
+  }
+  return days;
+}
+
+// ===== RENDER =====
+function render() {
+  const app = document.getElementById('app');
+  if (!STATE.currentUser) { app.innerHTML = renderLogin(); return; }
+  if (!STATE.currentUnidade) { app.innerHTML = renderSelecionarUnidade(); return; }
+  app.innerHTML = `
+    <div class="app-layout">
+      ${renderSidebar()}
+      <main class="main-content">
+        <div style="display:flex;align-items:center;gap:10px;background:white;border:1px solid var(--gray-100);border-radius:var(--radius-md);padding:8px 16px;margin-bottom:20px;box-shadow:var(--shadow-sm)">
+          <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px;color:var(--green-400)"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+          <span style="font-size:13px;font-weight:600;color:var(--gray-800)">${STATE.currentUnidade.nome}</span>
+          <span style="font-size:11px;color:var(--gray-400)">${STATE.currentUnidade.endereco||''}</span>
+          <button onclick="STATE.currentUnidade=null;render()" style="margin-left:auto;background:none;border:1px solid var(--gray-200);border-radius:6px;padding:3px 10px;font-size:11px;color:var(--gray-400);cursor:pointer;font-family:'DM Sans',sans-serif">Trocar unidade</button>
+        </div>
+        ${renderPage()}
+      </main>
+    </div>
+    ${STATE.modalOpen ? renderModal() : ''}
+  `;
+  attachEvents();
+}
+
+function renderSelecionarUnidade() {
+  const u = STATE.currentUser;
+  // colaboradores só veem unidades permitidas; supervisores veem todas
+  const disponiveis = STATE.unidades.filter(un => {
+    if (!un.ativo) return false;
+    if (u.perfil === 'supervisor' || u.perfil === 'supervisor_financeiro') return true;
+    return !u.unidades?.length || u.unidades.includes(un.id);
+  });
+  return `
+  <div class="login-page">
+    <div class="login-card" style="width:480px">
+      <div style="text-align:center;margin-bottom:28px">
+        <svg viewBox="0 0 24 24" fill="#639922" style="width:40px;height:40px;margin-bottom:8px"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+        <div style="font-size:20px;font-weight:600;color:var(--gray-800)">Selecionar Unidade</div>
+        <div style="font-size:13px;color:var(--gray-400);margin-top:4px">Olá, ${u.nome}! Em qual unidade você está?</div>
+      </div>
+      ${disponiveis.length === 0 ? `
+        <div style="text-align:center;padding:24px;background:var(--red-100);border-radius:var(--radius-md);color:var(--red-600)">
+          Nenhuma unidade disponível para o seu acesso.<br>Contate o supervisor.
+        </div>` :
+        disponiveis.map(un => `
+        <div onclick="selecionarUnidade(${un.id})" style="display:flex;align-items:center;gap:14px;padding:16px 18px;border:1.5px solid var(--gray-200);border-radius:var(--radius-md);margin-bottom:10px;cursor:pointer;transition:all 0.15s" 
+          onmouseover="this.style.borderColor='#639922';this.style.background='#EAF3DE'" 
+          onmouseout="this.style.borderColor='var(--gray-200)';this.style.background='white'">
+          <div style="width:42px;height:42px;background:var(--green-50);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg viewBox="0 0 24 24" fill="#639922" width="22" height="22"><path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"/></svg>
+          </div>
+          <div>
+            <div style="font-size:15px;font-weight:600;color:var(--gray-800)">${un.nome}</div>
+            ${un.endereco ? `<div style="font-size:12px;color:var(--gray-400)">${un.endereco}</div>` : ''}
+          </div>
+          <svg viewBox="0 0 24 24" fill="#639922" style="width:18px;height:18px;margin-left:auto"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+        </div>`).join('')}
+      <button onclick="doLogout()" style="width:100%;margin-top:10px;padding:9px;background:none;border:1px solid var(--gray-200);border-radius:var(--radius-sm);font-size:13px;color:var(--gray-400);cursor:pointer;font-family:'DM Sans',sans-serif">Sair</button>
+    </div>
+  </div>`;
+}
+
+function selecionarUnidade(id) {
+  STATE.currentUnidade = STATE.unidades.find(u => u.id === id);
+  render();
+}
+
+function renderLogin() {
+  return `
+  <div class="login-page">
+    <div class="login-card">
+      <div class="login-logo" style="justify-content:center;margin-bottom:28px">
+        <div class="login-logo-icon"><img class="login-logo-img" src="data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCACNAUADASIAAhEBAxEB/8QAHQAAAgMBAQEBAQAAAAAAAAAAAAgGBwkFBAMBAv/EAFoQAAECBQEDBAoNBwgJAwUAAAECAwAEBQYRBwgSIRMxQVEUIjdhcXJ1gbGzFRcyMzQ1OEJXdJGVshY2UnN2tNIYI0OEoaLB0wkkJURVVmKCkkVjlFRlg5PR/8QAHAEAAgMBAQEBAAAAAAAAAAAAAAECAwQFBgcI/8QANREAAgECBAMFBwQBBQAAAAAAAAECAxEEEiExBUFRExQycYEGByIzYaHBFZHR8DQWQkOx4f/aAAwDAQACEQMRAD8AcuCCCAAggggAIIIIACCCCAAggggAIIIIACCCCAAggggAIIIIACCCAwAEEcwXBQjX/wAnxWqcavyfKdgdko7I3MZ3uTzvYxxziP6rtdotBkzOVyryFMlxxLs3MJaT9qiICOZbnRginattF6epmzTrW9mb0qXMmWoNPcmMnoBWQE+cExxa1f2tVVY5WWt61tOKcsZTN3LUQ9M7vWGUcx7yhCckldhGWeWSCcn0SuX2TjJPNEDvXWPTO0Cput3hTETKeHYsu52Q+T1cm3kg+HEL7cHsDUyo33qhel/OEZMjSgKZTiekEDGR3xHwpV00q2e1sKw7atkpOUTRl+y5vzuucfTGGrxLD0/91/LX/wAPR4H2R41jbONHIus9Ptv9i2DrNedzAp030lrs6wRlNTrqk06Vx+kArtlDwYMRS4KtqFOKIvbW2gWsggqNNtOTMy/4pdVlSSIr+u3HcVeUTWq5UJ5JOeTceIbH/YnCf7I5SEIQnCEpSOoDEc6rxt/8cf3PYYL3ZrR4yu39Iq33f8FiUOrXlR2Zuuac6lVy9lU1szNQtq5mv5+bl0431S7nOFDjgD+3gCxmn11Uu9rNpd1UZwqkqiwHUBXukHmUhX/UlQKT3xCyaGJmDqTIVNhXJyVOQ8/PzZ4NMMBtQVvr5hnhz+Hoi0djdCzpFMTrTam6dPV2fmaYkp3cSyniE4HQMhUdLh+JniKWaa1PG+1PBsPwbiCw+Gk3FxvZu7W/99S6IIII3HACCCCAAggggAIIIIACCCCAAgiE66XfP2FpPXrupkrLTU5TmULaamN7k1FTqEcd0g8yieBiQ2hUnqxalHq8y2ht6ekGJlxDed1KlthRAzxwCYCOdZsvM6sEV1r7qFOaf2lKP0SQYqdw1WoM0+kyLucPOrVxyAQSAM8x5ymPtoNf7uolhpq0/KMyNZlJt6Rqkm1ndYmG1YIGeOCN08esjoguLtFmyk/gig701X1Fb1qrun9o02zeSpUmxNdkVqacYKw4hBIyDgkFfMBzCJfoBqNVtRKNWF1qiy1PnaPUVSDr0k+XpOaUkcVMr+cBzcCRzHPGAhGvGUsqLNgigxqrqdfNy1yW0itagzFEocyqUeqVZmFpE4+nnS0lBGB4c8CCd3OImuhWpitRKVVGKnSFUS4qHOGSq9PK98NODOFJV0pOFc/MUkceBJccaqk7FjwQt9I1d1nuKcu2Ytm0bRnKXbVSmJR/l5p1l5aWiojGVEZ3QDngMxb+jV9ympGndNu6Uk3ZITYWlyXcVvFpxCilQCsDeGRwOBwI4DmgughVUyYwQvc3tA1JnWtVBTRZM2M1Wk0B6snf30zymyd3Od3dCxjm5gTmLG1gq2pNFkJedsGj29UWGWnnakao+tsoSgAp3AkjOe3znqEAdtFpta2J9BFK7P8Af+qeocvTbkrFv2xKWnPNPFD8q+72UFoUUAbiiQBvJPm4xx9SL4vLUS6bl0u01t+SmpSloEvXKrOzzsshK1f0LZaIUDwKSc8cKGABkq4nW+G6XoMFBFR7P1/zFadqmn1ft1FuXJayG2X5Nt9TzLjJGEONrUSojm90SeKTk54Rx7VDV6t6o3hadjWxak9L23MoQtc9MOtOLStOU8QrBUSFdAA4Q7j7ZWTsX/BFZ6O6oq1C02qFy+xPsbUaY7MSs5KKc5RsPtJCjurGMpOR3xxHHnJoTqRN3to23flysSNNKTMrmRLb3JNttKVlXbEnmGTxgGqsWWZBC60jVbWy86JNXrYlg0FVqNrcMozUZlwT082gkKUjdISDwIAweIIG9Fs6O37TtSrCkrrprDkqHypqYlXFbypd5BwtBPT1g9IIOBzQJijVUnYpGyNMrSvPUjVKiXTKzDdwU65RUZSqykwWJ1uXmGwpoJcHzQARjGOMT+nbPmk9HddrFYpczXnmUlxc1XZ5ya3EgZJIUd3ozxEeG4T+SO1xQKp73I3pRXaa+T7kzUseUbPhKMJHhj1bRVxT8wwxYVvS0zO1CoIDs83Ktla0S+eCDjm3yOnHBJ64pr1lRpuRt4Pwz9QxUcOtNdW9klu35Iqm4NR61NuzEpbLjNt0HlCJWUpjCZclvmBUpIzkjjgYxnEQx3Lz5ffWt9487jqitZ854xLzpzcEnJieuSao1qyJGeXrE+hrH/aCST3uEeCSmtMEzRk6bP3XqNUgMGUtqmqSwFZ5i6ro74MeZ7pjMVLNJP1PtP8AqD2c4FT7KjOKtygrt+bX5ZHVrQjAUpI3uABPP4IkFAsu7q9uqpduz7rSuZ51vkWv/JeB9mYsC26Fq1O7ptHTaztO5ZeCJ2sOmfn8dYCc4PeVEiGg85cJDupmpl1XVniqSYeEjJZ6RyTfOPOI20uCc6kv2/v4PN433lyldYOh6yf4X8lQVSj2hbKgL21KoFNfwd6RphVPzef0d1AwD4RHXt5lipEGwdFbmucqwEVO6X0yMpn9INn3Q72Mww9maZ2DZqU/kzaNJp7ieZ5DAU9/+xWVH7YlwjpUuHYeltH99TyGO9quM466qV3FdI/D91r+7KETpXqRfMo3TdSLjpFCtckLdty1mFNImAMHcdeVx3eHEDIPe54vCkU+SpNMlaZTZVqUkpRpLMuw0ndQ2hIwEgdQAj1wRsSSPPqOt27v6hBBBDJBBBBAAQQQQAEEEEABBBBABX20bbdYu/RW5LboEqJqpzzDaJdkuJbCiHkKPbKIA4JPOYjemFa1mlHbftyvaX0+n0eWZblJmoorjbq20Nt7oXyY4kkpHAE88T3Vi6XbJ05rd1sSSJ1ymSxfTLrcKA4cgYKgDjn6oWVe2PWggn8gJA4GfjNf+XEZSUdzLVlCFRSbsyyNUrA1HvvXGm1imzstbtFtmU36TUJhlubS7NrxyigwVAggYAUrm3Mjnj+9GbC1D0/1ir71VmJau0C5ZcTk7U5dtuWDc+lR/oN4kbwKslPA5SegxbtjVldyWXRbgdl0yy6lIMzamUq3g2XEBW6DgZxnGcRxta7ze0902ql2y1PbqDsjyW7LuOltK991KPdAHGN7PN0Q9FqPs4fMu+pSepumt1Tuv1w3avSim33Qp6TlmZVqbqjMuG3ENoClgKyc9qU8R0xOdmCyLvs6UuVy4pKVodOqU+H6Xb8tN9kN05GDvAL5hvZTwH6OeGcRUL22RWUNLX+QEgd1JPxmv/Lhlbsu96h6STt8IkG33pek+yAlVOlKVHkwrc3sc3HGcQlJPVFdFUnJzi+rKgtygataM1q4qZZ9oSl62xV6g5UJAifRLPSbrnOlwK50jAHDnwDkZIiabOtgXDaTdyXJecxKrua6Z/s2eZlVbzUsBvbrYPSRvqzjhzDjjJpcbY1Zx+YMh95r/wAuD+WLWf8AkGQ+81/5cR7SPUjGtQi732PpM7O141ikagzzrk5SK5M1l+Zo7KKkOxahLlSlbjqEHAKs4BVgg4zwzF726zcdB0GRKW/Y7NFuKUpq2pShtTLZabmeIBDm8UlJUd/Kjk5OeOYoNzbHrKW1K/ICQ4An4zX/AJcMsbsdGkH5d9go5b2B9luxOUO7vdj8rye9jmzwzjzRKLi9h0nS1cXyF5Z2ddSlaMOWw7eVMSHz7Ku0k0xCnDPkb2Oyt/O9kBO/zeaL/txF1VTR1uVuandiXM9SVy83Ll5Cwp/cKN7eSSnCjhXPw3u9C4N7Y9ZU2lX5ASHEZ+M1/wCXF57Ouqp1XtaoVR+lNUubkZ4yzku2+XRulCVJXkgHjkjGOiFGUW9B0XSzZYPc+mzFa9ds3ROg25cckJKqSnL8syHUubu88tSe2SSDwIPAxCJi2tTNLtVLquexrZlrwt+6XxNzUkZ1MtMyswM5IKuBTlSjwzwIHDGSweIhGuF9p0204n7rTJtzz7DjTTEst0th1a3AnG8AcYBJ5uiJci+UEopvkRHQqxrwlL3ufU7UJEnJ1+4ENsN06Uc5REnLoxhKlDgpXaoHDPuc5ycCAV7QW5rq1C1Oq81MTtC9kFodt6dl6hutvr3MKS82g7xQd0DtsYySMxwv5YtZ6bBkPvNf+XDHaK3m9qDppSrumKe3T3Z/ld6XbdLiUbjq0cFEDOd3PN0xFSjLRFMHSq/DFke0Ntyq0LRJNtVG0Je26qyw8y9LMzCHUTTpTjl99Kjkr4ZyeB4cwEeHZ30/rFD2exYt5SRkJqZROMTLTbyHClt4qGQpJIzuqzFwgQY4ROxeqSSSFqs2U1+0zs9WnNFsml3ExKlxqj11NRQ0202tSlBTrau2JBUTjzcQMm09nrT13TPTSUtycm25uoLecm555vPJl5wjITnjgAJGTz4zgZxE2rNVplFprtSq9QlZCTZGXH5l1LbaR31HhFFXrtX6fUZxxi35OpXI6j+kZSGJc+BxzifCEkRG6juytqnSd5Mk+1RQanUNO5e5LfllzFdtSosVqSQ2kqWsNK/nEADicoJOOndiG064bi1zvSeZsC4KnZtnSkoyufqktT+TnKhNLB/mg4sAgNpGMjm74IxcunlzzVx6c0m7avTkUhyekuzVywd5QNNnKk9sQM9pgnh0x6beuD2fsiWuKkS6XFTcmZiXYUrAK8HCCccO2GCcQXV7cy7sJyg6yvl0T/7S+z0IHb+zxppT5wVGr06cuqpZBVOV6bXNqJ8U9p/di0abTpCmSiZSmyUtJS6PctS7SW0DwBIAhd7O2ubTnlol7st2qW+9ncW60RNNIUOCs7oCwAf+kxfVp3Rb12UpNUtusyVVk1f0ks6Fbp6lDnSe8QDDTT2IUpUpeA6+OMfsEEMuCCPHXZ1VNok/UUth1UrLOPBBOAopSVYz0ZxFFN7QtRW2lX5KSoyAcdnK/ghpXAYGCODp9cDl0WZTq+7KplVzjZWWUr3wjCinnwM83VHehAEEEVtqDrBQLVqLtJl5d6rVFk4ebYUEtsn9FSz87m4AEjpxABZMEUAdoOoZ4WrLY788r+CP7Z2hJsOAv2oyW+nk5473myjEPKwuX5BEQ071CoN7sOinKcl55hIU/JvgBxAPzhjgpOeGR58R7NSrkdtKz5yvMyaJxcuWwGlObgVvLCefB6+qEBI4IoD+UHUf+VZX/wCcr+CD+UHUf+VZX/5yv4IeViuX/BFG0raDYU+lNWtl9lontnJWYDhSOvdUE58xi4LartLuOkM1ajTaJqUdyAtPApI50qB4hQ6QYLDIPtRfJ+vLycfxJjOR73tfimNG9qL5P15eTj+JMZyPe9r8BjPWOVj/AJkTTfRbuQWd5Dk/UpiIbYvyeLk8Mt+8NxL9Fu5BZ3kOT9SmIhti/J4uTwy37w3FsvCzZL/H9PwZ6zXwV3xFeiNEdU/kr1j9lh6gRnbNfBXfEV6I0S1T+SvWP2WHqRFVLZmLBeGXkZ49Hmi5LT2btRrntim3FS3qAJKoy6JlgPTi0rCFDI3gEEA+eKb+b5o0n2du4ZZfkdj8IiNOKk9SrCUY1ZNSFOc2UNVVNqSHrayUkfDnP8uGquGmTVE2bahRZ0tmap9oOSrxbOUlbcoUqweGRkGLEiLav9ye7/Ic76hcXxio7HQeHhShJx6MzCY94b8UeiGb/wBH9Wuxr0ua3VqwmekWpxAPSppZQf7HR9kLIx7w34o9EWhstVv2C18td9SsNzjy6e4OsPIKU/3wiM9N2kjmUJZayZotCwf6QOtlm0rYtxCxmdqDk24kHjusowM97edH2Qz55oRXborXsjrSxSkKPJ0iltNlPQHHVFxR/wDHk4vqO0TqYyWWkyh+eNBtjz5O1sf1n95djPgRoPsefJ2tj+s/vLsVUvEYeH/MfkW4IrLXjWGg6WUZHZCRUK7NoJkaYheFLHNyjh+Y2D085PAA8cd7V6+qdpzYc/dFRAdLIDcrLBWFTMwrg22PCeJPQAT0RnFdlwVi6rjnbir82qaqU85vvOH3I/RQgfNQkcAOgCLZzymzFYnslZbnT1Gv269QqyandVUXN7pJYlUZRLSw6m2+YeMcqPSY9+iVhTOpGotPtxtKxIA9k1R1P9FKpPbcetRwgd9WegxD5KVm5+el5CQlnZqcmnUsy7DSd5brijhKUjrJh+9E7Eo+iWl0zPV19n2TeQJqszaeIKwO0ZR1pTndSPnKJPzsRSlf4pbGHB4epi6yW/5fQ+20PcrFvWO3bVOKWZqqI7Hbbb4cjLJwFkY5hjCB4e9Ef2XLrQlE3Zk25uqSVTchk86T74geA9sB1KPVFR3rcc9dtzTdenwUKeISyznIYaHuED0k9JJjn0yfnKVU5WqU57kZyUdDrC+gKHQesEZBHSCY8/PiTeL7VeFaeh+hsN7IQjwN4GelSXxX6S5ei2/fqcra608csrU5+ryTBTRLhWqal1JHatTHO813uJ3wOpRA9yYq607jr1pVtutWzVpml1Bv+lZVwWP0VpParT3lAiH8qsjbeu+kL0hNfzBfHEgBTlPnEDgoeAn/ALkqI6YQS8bcrFo3NPW3X5bsepSLm44B7haTxS4g9KFDBB/xBj0DaklOOzPz/wASwVXBV5RksrTs10Y7Wzpr5TdRQi3q8hml3U22VBpJwzPJA4rZzxCgOJbPEDiCRnF4DjGUcrMTMpNsTknMvSs1LuJdYfZVuracScpUkjmIMaE7NWqSNTrG7InS23X6apMvVGkDAUrHaPJHQlYBOOghQ6IthO+jLcJinU+GW5PL1/M2t+T3/VqhKWPeG/FHoh1r1/M2t+T3/VqhKWPeG/FHoi6JuY2ug/cit/8AUL9YuJxEH0H7kVv/AKhfrFxOITGca+Kqqh2fV6uj3yUlHHW+Ge2CTu/24hLsuKJW6tTjqyVOLUclaiclR75JJhutau5Tcf1JXpEKI572rwGHETJxaWll4XNSG6tIy8nLybwyyuaeKC6P0gkAnHUTzxzb3sa47NUwa3LM8hMKKWn2HN9tSgM7p4Ag448RxwYabTgAaf2+AAB7GscB+rEQnaiA9rhg4GRU2cHq7VcF3cLFDWBV3aDfFGqrK1J5ObQ26E/ObWQhafBg58IEMbtD9yaq+Ox61EK5IfGcj9bZ9YmGj2h+5NVfHY9aiG9wFVWoIQVHOAMmLLltEr2mJZqYbdo+46gLTmZVnBGR8yKymfg7nin0Q8FB+IpD6s3+EQSdgQmly0Oq23WHaTWZbsebbSF4Ct5K0nmUlXSDg/YYsPZlrT8jfL9E3lGVqcspwozwDreCFeEpyD4B1R6tqoAXfRCAMmnuAn/8giM6Cd1ujeK/6pUHIC59qL5P15eTj+JMZyPe9r8BjRvai+T9eXk4/iTGcrg3kKSOcjAjLWOXj/HE020W7kFneQ5P1KYiG2L8ni5PDLfvDcVxp/tR6f27YlAoM5SLlcmadTWJV5TUq0UKW22lJKSXASMjhkCOFrztFWTf2ldXtSj0y4GJ2d5HklzUu2lobjqFnJDhPMk9HPFjlG25c69Psct9bfgVia+Cu+Ir0Rolqn8lesfssPUiM7pr4K74h9EaI6p/JXrH7LD1IiulsyjBeGXkZ4/N80aT7O3cMsvyOx+GM2Pm+aG30s2m7DtTTi37bqFJuN2bpsg1LPLYlmlNqUlOCUkuAkeECFSaT1IYKpGEm5Ma2Itq/wBye7/Ic76hcVZQdqrT6s12nUeVo9zImJ+aalWlOSrQQFOLCQVEOHhk8YtPV7uTXf5DnfULi+LT2OjOpGpTllfIzCY95b8UeiPZS59+j1eSqzBUh+nzTU0jjghTawr/AAjnqJTIEjnDWR9kTLV+jtUa/JyVaSBLTMpKTrI6Nx+WbWf7xUPNGVLS5xLNPMaYU+aZn6fLz0urfZmWkutqHSlQBB+wxmlrTWjcWr12VgL323qq8ho/+22eSR/YgQ6OkF7BGyhI3W8+FPUmhPIcJOTykslaAD3zuJ+2Ea04pC7hvy26G5kmo1SXZdIGThTid8/ZvGLqjvZG/GTzxilzONjBIMaDbHnydrY/rP7y7CD3HyX5S1fkAAz7ITHJgdCeVVgfZiH42Pfk7Wx/Wf3l2I0tJMrwGlV+Qvm3Heblb1LlrRl3iZCgMhTqAeCpp1IUSfFbKQOreVC/R27/AKsuvX7cVbcUVKnqpMPZ/wCkuEJ/ugCOGULcw01744QhHjE4H9piMndmStPtKjkxtdh3TNlMk5qfWJdKnnSuXoqVjIbbBKXXx31EFAPQkK/Sj6a536u7a8aVTnj7BU50hvB4TTw4Fw9aRxCfOekRbOoKkae6DJpFMUJdcvIsUuXUjhhSgEFQ7+N4564WBCUoQEpGABgDvRyeL4hwSox56s+1+7fgNNxeOqK7i7R87av72Xqfogggjz59eJRpjek3Y9ypqDe+7Tn8N1CXT89sfPA/TTkkdYyOmLH2tNO5K/tOEXrQUIfq9HluymHmv98kyN5beenA7dPfBHzjFIQx+y/WFVGx5yiTB5QUyZLaAriORcG8lPgB3h4I7nCMS8zoS2ex8w94vAqVXDrHwVpKyl9U9n5p6eT+hn4khSQpJyCMgxZ2zDejlk6x0iYcdKKdVVimT6c4TuOEBtZ8VzdOeoq64iGotEbtvUK47fa96p1TfYa/VhZKP7pER9xa20FxslLiO3QRzhQ4g/biOynlZ8Ei3Tnoal3p+Ztb8nv+rVCUse8N+KPRDfiqGuaOGtKOTP2/2SfCuX3j6YUCX94b8UeiNkT0SkpJNDa6D9yK3/1C/WLicRB9B+5Fb/6hfrFxOITJEP1r7lNx/UlekQojnvavAYbvWvuU3H9SV6RCiOe9q8BiURMczTnuf2/5Nl/VpiE7UPc3Y8psehcTbTnuf2/5Nl/VpiE7UPc3Y8psehcRW4xcJD4zkfrbPrEw0e0P3Jqr47HrUQrkh8ZyP1tn1iYaPaH7k1V8dj1qIk9xCpzPwdzxT6IeCg/EUh9Wb/CISB1JW0tA51JIhhZHXi2pSmS8t7D1hbjLKUcENgEgAc+9BJAiObVf53UP6g56wRGNBO63RfFf9UqOZqXeE1e1x+y0xLplGGWuRlpcK3i2jOSVHpUSePRwAiV7NdAnqjfCLhQyoU2nNOAvkdq46tO6EJPSQCScc3Drg5AWftRfJ+vLycfxJjOZRABJOAI0Z2ovk/Xl5OP4kxnI772vxTGWscriHjRNqfpNqdUafLVCQsWtTMpNNJeYeQ0ndcbUMpUO25iCDHnuDTPUK3qQ/WK7Z1Wp1Ol93lpl9tIQ3vKCRnBPOSB540J0W7kFneQ5P1KYh+2J8ni5PDLfvDcN0klck8HBUs/0M9pr4M74h9EaI6p/JXrH7LD1IjO2a+Cu+Ir0Rolqn8lesfssPUiFT2ZHB+GXkZ4jm80TOk6ValValy1Updj1mckZpsOy77TaSlxB4hQ7bmMQw+580aT7O/cMsvyOx+ERGnFSepThaCqyaYmGn2kmqElf9tzs5YdbYlperyjrzq2k7raEvJKlHtuYAEw8er/cmu/yHO+oXEpiLav9ya7/ACHO+oXF8IqOx0ewVKlJLoZfK+AH9V/hF5bU9G7HlNNbiQnCKnacqws/pLZQg/hdH2RRwGZPH/t/4Q2u0jRxUdk3TyuoSVOUtin7x6m3ZcNn+9uRRDWLObTjmUl/eRW9pXoZLZDvO2OUw85XJeXa44PJzG64oDvfzLv2x89jWiezGvlLfW0HGaVKzE8vIyArd5NB/wDJwHzRUCXnRLrlw6sMrUlakA8FKAIBI6xk/aYaf/R/UcD8sbocRgoSxIMqI6gpxfHztw4vM0SoSdWpFPkK1PL5SoTjn6Uy6ftWY0A2PuOzrbI701+8uxn0TlxxX6S1H7VGNBtjz5O1sf1n95dh0/EyeA+Y/Iz+mEKam5hpYwtD7iVDqIWQY+lPWlupyTi/commVK8AWkmJbrnQF2zrFdVHUjcQmoOTDI62nv51H9i8eaIS4nfbUjOMgjPVEHozC45ZW6Ghu1ElS9Mm1IBUlNSlyojoHbDP2kQs4hkrKnmNYNnGU5N5AnZmQEu9kglqcZwDnq7dIPgUIW91p5h92WmmVsTDKy280sYU2tJwpJ8Bjh8ZptVVPk0fon3cY2nV4fOin8UZXt9Gl+U0fzBBBHHPoYReuyYle5cq/mcpLp8+6s//AMiiVqCEFSjgAZJhm9LJKX020dmq9cP+qq5JyqTwVwU2kJ7Vvxt1KRjrOI6fCKbliFLkjxPt9jKdDhMqUnrNpL0d2/S33Et2hXW3tdb1W2MJFVWk+FKUg/2gxAncBpZPMEmPZWKlM1msz9ZnPhNQmnZt7vKcWVEebOI/KTTJmtVeSosmgrmahMtyjKR0qcUEj0x6B6s/Ncnmnc0SsptbWzdSW3AQoWm3kH6qIVdj3hvxR6IcyvSbVO05qFOY96laQ4wjhjtUslI/sEJmx7w34o9EbYnoYq0UhtdB+5Fb/wCoX6xcTiIPoP3Irf8A1C/WLicQmTIfrX3Kbj+pK9IhRVDKSOsYhuta+5Tcf1JXpEKKSACTzCJREy5Ld1zVR6BT6SLXL3Ycs2xynZu7v7qQM43OGcRxNT9VFXvbiKMaEZDcmUTHK9k8pndB4Y3R1x5KXpDe9TpkrUZSWpypeaZS80VTeCUqAIyN3gcGOdeGnd0WnSU1StMyaJZTyWQWZjfVvKzjhgcOBgsgIxIfGcj9bZ9YmGj2h+5NVfHY9aiFckPjOR+ts+sTDR7Q/cmqvjsetRA9wFWUQlJUo4A4kxJ29Pb7cbS43adRUhYCkqHJ8QeY+6iKzPwdzxT6IeCgfEVP+rN/hEDdgExmJap2/WUt1CnKlZ2XIc7HnZcKSeolCuCknziL70Y1Wark2xbNYkZWnzpQRJuSqdxh7AyUbvzFYBOOIPHGOaPFtXyzBpdAnOTTy6Zpxrfxx3CgkjwZSDFO2ApSL+t1aThQqbGD/wB4g3QDC7UXyfry8nH8SYzke97X4DGje1F8n68vJx/EmM5Hve1+AxlrHLx/jiab6LdyCzvIcn6lMRDbF+Txcnhlv3huJfot3ILO8hyfqUxENsX5PFyeGW/eG4tl4WbJf4/p+DPSa+Cu+Ir0Rolqn8lesfssPUiM7Zr4K74ivRGiWqfyV6x+yw9SIqpbMxYLwy8jPH5vmjSfZ27hll+R2Pwxmx83zRpPs7gjQyy8jH+x5f8AAIKO4cP8bJ7EW1f7k93+Q531C4lMRbV/uT3f5DnfULi9HSrfLl5MzBb+DJ8QeiH3nKMbo2LWKYhO+6u0mXWhjJLjTSXE47+UCEJZ94R4o9EaR7PG5N6B2cl1AcbXRmm1pIyFDdwRGejuzm4OOZzRm82oLQlaeZQBEPjsgUY0fZxl5tSd1yqLmqgrrwSUJ/utpiuXdjZ/LoY1CQ2gqVyYNKzuJycD3zjgYhlKPQ2LW01lrelnOUZpdJEqlwjG/uNbu8R0ZxnzxOnBxd2WYXDypycpIy/a4tg9caE7HnydrY/rP7y7GesucsI8URoVsefJ2tj+s/vLsQo7lWB+aysNvCwXHpan6kU9nIlEiRqu6OZoq/mnT3gpRQT/ANaeqFKjVar06Sq1LmqXUpVqakptpTMwy4MpcQoYUk94gxnnr9pLVNLLmLW69NW5OOH2LnyM8OfkHT0OJHT84DI45AlUjzHjsO088TpbM2ry9MLldlaoXXbZqi09nIQCpUq4OCZhCenhwWBxIAPEpALUah6a0XUSWZuu1apKNTk00laZls8pLTqMcCop5lY4bw6sEHoz7iX6cal3tp6+VWtXHZaWWrecknk8rLOHpJbPMT1pwe/FM4QqwyVFdGrg3HMRwusqtGVmv7Zrmi8KxprftLeLb9szcwB/SSZDyCOvI4/aBHxpun19VF5LUtalSRvcy30BlA8JURH3oW2FWGWQmu2NJzbgGC5IzymQT17q0qx9seirbYs2tgppOn7bT36U5Ut5I8yEAn7Y5/6RQvfM7H0OPvTxShZwhm62l/P5LM0y0Ybo041XrxmJaZflv51mTbOWGVDjvuKPuyOccABjPGKS2tda5a8nTZFpTXLUCXdC5+dQe1nnUnKUIPS0kjOeZSgMcBk11qXrNqFqC05KVus9jUxfuqdT0lhhQ6l8SpY7ylEd6K9HDgOA70b6VOnRhkprQ8Fxz2ixXFqvaVpXf2S6JcghgdiSwXLg1AdvSdYJplv5TLqUO1dnFpwAPEQoqPUVIiqdLLBr+o91tUCgtbvMucnFoy1JtZ4rX1nn3U86j3skaLae2lR7HtGQtmhM8nJSbe6FK4rdWeKnFnpUokknv9UXU43dzmYLDuUs72R6L0/M2t+T3/VqhKWPeG/FHoh1r1/M2t+T3/VqhKWPeG/FHojTE7A2ug/cit/9Qv1i4nEQfQfuR2/+oX6xcTiExkP1r7lNx/UlekQojnvavAYbvWvuU3H9SV6RCiOe9q8BiURMczTnuf2/5Nl/VpiE7UPc3Y8psehcTbTnuf2/5Nl/VpiE7UPc3Y8psehcRW4xcJD4zkfrbPrEw0e0P3Jqr47HrUQrkh8ZyP1tn1iYaPaH7k1V8dj1qIk9xCpzPwdzxT6IeCgfEVP+rN/hEI/M/B3PFPoh4KDwocgD/wDTN/hEKQIqTau/N6g/X1+qVFL2F+flveU5f8Yi5dq55oUagS/KJ5Yzi1hGeO6GyCcdWSB54pqwvz8t7ymx+MQLYBhtqL5P15eTj+JMZyO+9q8UxqfeFvUu67Zn7drbK3qdPtclMNocKCpOQeChxHN0RVZ2X9HSkg0KfweHxm//ABRTUg5bGPFYeVWSaJ5ot3ILO8hyfqUxENsX5PFyeGW/eG4s+gUqSoVDkaLTm1NyUhLty0uhSiopbQkJSCTxPADiY8N92rRb1tebtu4JdyYps3ucs2h1TZO6oKHbJII4pETaurF7pvssn0sZZzXwV3xFeiNEtU/kr1j9lh6gRy17L2jq0FBoU/hQwf8Aab/8UWhWbYpFWs5+0p1hxdJfk+wnGkuKSotbu7jeHHOBz88QhBxTuZ8PhpU00+ZlsObmjsyl13XKSrUpJ3TXZaXZSENMs1F1CEJHMEpCsAd4Q8P8mDR7/gU/95v/AMUH8mDR7/gU/wDeb/8AFFfZSMywNVbMR9+8705FZ/LK5Pcn/wBVe/ih+5p52Y2V3H5h5x552yStxxxRUpajJZKiTxJJ6Y4atl7R1SSk0KfwRj4zf/ii0TbVJNmfkiWF+xHsf7G8lyit7kOT5Pd3s5zu8M5zFtOLjuaKWGqRTUnumZZMe8N+KPRGj+zGre0Bss//AGtv0mI4nZe0dSkJFDn8AYH+03/4otSz7epdqWzIW5RWVs06QaDMuhbhWUpBJwVHieeI04OO5LDYeVKTb5nWjk3k7yNoVl7OOTkH1fY2ox1o81Vkpep0yap02lSpeaZWw6lKiklC0lKgCOI4E8YtNkldOxlFK/BmvEHojQrY8+TtbH9Z/eXY8KNl7R1CEpTQp8BIwP8Aab/8UWfYtrUayrXlLat+Xcl6bJ7/ACLa3VOKG8srPbKJJ4qMVQg4u7MWGw0qVRyZ245ty0OkXJRZmi16nS9Rp00jcel30byVD/Ag8QRxB4iOlBFptauJZrBstXDRHXqnp+tddpnFXse6sJnGB1IUcJdHhwrxueF4qUpN0yfXIVOUmZCcbOFsTTSmnEnvpUAY1ZPERyrjtq3rklexbgodOqrOMBE3LJd3fBvDh5ordNPYwVcBGTvHQy1gjQapbOOjk64pz8kESqlc/Ys2+0PMkLwPMI+Ujs2aOSywpVqrmcHID8/MLH2b+D54h2TM36fU6oz/AGgp2YRLspU6+sgIabSVLUeoJHExd+k2zXe93usztxtOWtRjgqU+j/XHR1IaPuM/pLxj9Ew6Fq2VaNqI3bbtqlUo4wVy0qlCyO+oDJ85jvxJUktzRS4fGLvN3I7p5ZFt2FbzdDtinIk5VJ3nFZ3nH144uOLPFSj1nwDAwIkcEGYtOgkkrI5F6/mbW/J7/q1QlLHvDfij0Q79wKpyaFUDV322KcJZzstxxe4lDW6d8lXQAM8Yqu1bD0UuZDgtyclqpyAHKJlqqtakA8xICsgHoPTDTsJyV7XKGla1WpVhEvKVqpy7CBhDTU2tCE+AA4EfsxcVx8g5i4qyO1P+/OdXjQyg0X08OcUyZOOHw13+KOGqw9FluV2WEw247QWuUqzaKi6pcmgoK8rAVkdqknzGHmQNpEo1VJVorWFKJUo0sEknJPAQpznvavAYc5xm37qstmVDomqLVZFCmilxSC6wpIUlQPBQ7Ug9fGIl7Tem6kgdgPEKRvjE+5xT1+65u/AnYe5K9OfzAt/ybL+rTEJ2oe5ux5TY9C4smlS0lTKVJyEmQiVYaQwwCve7UDCRk85wI594W7Q7spiaTW2y/LpeDoQh4oVvpBxxSQeY80ILibyHxnJfW2fWJho9ofuTVXx2PWoiPXTZeilmqk5i5Z6Wo5ddCpbsuqLQVqQQcgFXEDhk8wzxiybhplEuuguUuoKRNSEyhDpDT+7vJBCkqCknOOAOYbdxXWwlxAIwRkR0k3BcKUhKbgq6UpGABOuAAdXPDIJ0b05UrdTT31KxnAn3Ccdfuu+I/Bo5pwo4TIPKO7vYE+4eHX7rmh5hixzUxMzb5fm5p+aePAuPOqcVjqySTiJroVb03X9Q5CZZbUZKlOiamngO1SpOdxGf0irBx1AxZtpWhoncMwymiAVFTsk3PtoVMTG6phxa0IX2xHOptYxz9rzRatHp1Ko0mim0qTlpJhsbyWGEBIA68D0wswk09mcjVKiVm49PqzQ7eqnsVVZyXLcrOcotHIryDvbyO2HAHmhcPaA17+mAfec7DaQRBpPcrqUY1Hdime0Br39MA+852D2gNe/pgH3nOw2cELIivukOrFM9oDXv6YB95zsHtAa9/TAPvOdhs4IMiDukOrFM9oDXv6YB95zsHtAa9/TAPvOdhs4IMiDukOrFM9oDXv6YB95zsfntAa9/TAPvOdhtIIMiDukOrFM9oDXv6YB95zsHtAa9/TAPvOdhs4IMiDukOrFM9oDXv6YB95zsHtAa9/TAPvOdhs4IMiDukOrFM9oDXv6YB95zsHtAa9/TAPvOdhs4IMiDukOrFM9oDXv6YB95zsHtAa9/TAPvOdhs4IMiDukOrFM9oDXv6YB95zsHtAa9/TAPvOdhs4IMiDukOrFM9oDXv6YB95zsHtAa9/TAPvOdhs4IMiDukOrFM9oDXv6YB95zsHtAa9/TAPvOdhs4IMiDukOrFM9oDXv6YB95zsfitn/XopI9uHnH/E52G0ggyIO6Q+pBKla1cf0JmbNfnWqhXF2+qnrmXXVbj8wWdwrKldtgq45PHjEMuWyr4vCUmp6dotJt+cZtqbossyxUS87Nqf5MbzrqW0hLaA3lKRk7xzwxxu6CJFkqKkR6hSC6DKTFColvykjSZCWT7GFM1wecVvlaFJxlGFbpKiVFW+T0caXtzRzUOlOuT0xWbamZur0upydcLMs40485N77qXFOEkPFt4hKTuow2SB1QxMEA5UYy3F6puidzy9627WJ2dkJqWp8lSkco3NrbmJFcmwELaZy2oKZdWCSMoyFq3geEfzSNFbklbYuqlT0rRJz2el2FS7cvUX5cU1KJhThkGllC/wDVkhW8nCQCoqCkbpGGHggILCwSshbq1ohek/b9IlHVWpOPMUh+moacU8wzSHFvqcROSwaQEqfCSAo7reShOCASI7dR0arDl2vXOzMSLlYTc9Ln2Kk48tL5kmGGmphBwMBThS4SkcFb3E82L2ggGsPBFY31Z11p1JTfVpM29U5h+jGkTElW1uNttI5QuBxtaELPEqIWjA3gE8eERyo6YXlPavy14Ofk00wy+cvSu8085LKk1M8gtPJ9uA4QcqWQUhOEgiLxggHKjGRQTmh9Vpmk9rUu0JimUa76Y2puenuUcU2/2QxyE2rexvKON1aCRwLaOaPtM6QV+W1Nt2r0UUKVolAfkW5N1C1NzvYLLBaWwshvLhJOcle6QcbueMXvBAJ4eDFpXs/16YtEyc6qjPViUtOWplLmRMOgSs83NPOl1JCQUjC0YVjOQRgDnkqdJbmOrqboM9S0sCvCrmsh532SVL8luexpRjc5DPDO9jd+bvcYvGCCwLDwWx//2Q==" alt="HemoLab"></div>
+      </div>
+      <div class="login-title">Bem-vindo</div>
+      <div class="login-sub">Faça login para acessar o sistema</div>
+      <div id="login-error"></div>
+      <div class="form-group"><label class="form-label">E-mail</label><input class="form-input" id="login-email" type="email" placeholder="seu@email.com"></div>
+      <div class="form-group"><label class="form-label">Senha</label><input class="form-input" id="login-senha" type="password" placeholder="••••••••"></div>
+      <button class="btn-primary" onclick="doLogin()">Entrar</button>
+    </div>
+  </div>`;
+}
+
+function renderSidebar() {
+  const u = STATE.currentUser;
+  const nav = (page, icon, label) => {
+    if (!canAccess(page)) return '';
+    return `<div class="nav-item ${STATE.currentPage===page?'active':''}" onclick="goto('${page}')">${icon} <span>${label}</span></div>`;
+  };
+  return `
+  <aside class="sidebar">
+    <div class="sidebar-logo" style="padding:12px 14px">
+      <img src="data:image/png;base64,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" alt="HemoLab" style="height:44px;width:auto;object-fit:contain;max-width:190px">
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Principal</div>
+      ${nav('dashboard', svgHome(), 'Dashboard')}
+      ${nav('agenda', svgCalendar(), 'Agenda Semanal')}
+      ${nav('agendamento', svgClock(), 'Agendamentos')}
+      <div class="nav-section-label">Clínica</div>
+      ${nav('medicos', svgDoctor(), 'Médicos')}
+      ${nav('prontuarios', svgFile(), 'Prontuários')}
+      <div class="nav-section-label">Financeiro</div>
+      ${nav('financeiro', svgMoney(), 'Caixa do Dia')}
+      ${nav('caixas', svgReport(), 'Relatório de Caixas')}
+      <div class="nav-section-label">Administração</div>
+      ${u.perfil==='supervisor'?nav('usuarios', svgUsers(), 'Usuários'):''}
+      ${u.perfil==='supervisor'?nav('unidades', svgBuilding(), 'Unidades'):''}
+    </nav>
+    <div class="sidebar-user">
+      <div class="user-info">
+        <div class="user-avatar">${u.nome.split(' ').map(n=>n[0]).slice(0,2).join('')}</div>
+        <div><div class="user-name">${u.nome}</div><div class="user-role">${perfilLabel(u.perfil)}</div></div>
+      </div>
+      <button class="btn-logout" onclick="doLogout()">Sair do sistema</button>
+    </div>
+  </aside>`;
+}
+
+function renderPage() {
+  const pages = {
+    dashboard: renderDashboard,
+    agenda: renderAgenda,
+    agendamento: renderAgendamento,
+    medicos: renderMedicos,
+    prontuarios: renderProntuarios,
+    financeiro: renderFinanceiro,
+    caixas: renderCaixas,
+    usuarios: renderUsuarios,
+    unidades: renderUnidades,
+  };
+  const fn = pages[STATE.currentPage];
+  return fn ? fn() : '<div>Página não encontrada</div>';
+}
+
+// === DASHBOARD ===
+function renderDashboard() {
+  const hoje = new Date().toISOString().split('T')[0];
+  const agHoje = STATE.agendamentos.filter(a => a.data === hoje);
+  const agTotal = STATE.agendamentos.length;
+  const recebidoHoje = STATE.caixas.filter(c => c.data === hoje).reduce((s,c) => s + c.total, 0);
+  const agConfirmados = agHoje.filter(a => a.status === 'confirmado' || a.status === 'concluido').length;
+  return `
+  <div class="page-header">
+    <div><div class="page-title">Dashboard</div><div class="page-sub">Segunda-feira, 07 de abril de 2025</div></div>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-label">Consultas Hoje</div><div class="stat-value">${agHoje.length}</div><div class="stat-sub">${agConfirmados} confirmadas</div></div>
+    <div class="stat-card"><div class="stat-label">Total Agendamentos</div><div class="stat-value">${agTotal}</div><div class="stat-sub">${STATE.agendamentos.filter(a=>a.status==='agendado').length} pendentes</div></div>
+    <div class="stat-card"><div class="stat-label">Médicos Ativos</div><div class="stat-value">${STATE.medicos.length}</div><div class="stat-sub">${STATE.medicos.map(m=>m.especialidade).filter((v,i,a)=>a.indexOf(v)===i).length} especialidades</div></div>
+    <div class="stat-card"><div class="stat-label">Recebido Hoje</div><div class="stat-value" style="color:var(--green-400)">${fmtCurrency(recebidoHoje)}</div><div class="stat-sub">Caixa do dia</div></div>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Consultas de Hoje</div>
+      ${agHoje.length === 0 ? '<div class="empty-state"><p>Nenhuma consulta hoje</p></div>' :
+        `<table class="data-table">
+          <thead><tr><th>Hora</th><th>Paciente</th><th>Médico</th><th>Status</th></tr></thead>
+          <tbody>${agHoje.sort((a,b)=>a.hora.localeCompare(b.hora)).map(a=>`
+            <tr>
+              <td><b>${a.hora}</b></td>
+              <td>${getPaciente(a.pacienteId).nome}</td>
+              <td>${getMedico(a.medicoId).nome?.split(' ').slice(0,2).join(' ')}</td>
+              <td><span class="badge ${statusBadge(a.status)}">${a.status}</span></td>
+            </tr>`).join('')}
+          </tbody>
+        </table>`}
+    </div>
+    <div class="card">
+      <div class="card-title">Médicos</div>
+      ${STATE.medicos.map(m=>`
+        <div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--gray-50)">
+          <div class="avatar" style="background:${m.cor}22;color:${m.cor}">${m.nome.split(' ').map(n=>n[0]).slice(0,2).join('')}</div>
+          <div>
+            <div style="font-size:14px;font-weight:500">${m.nome}</div>
+            <div style="font-size:12px;color:var(--gray-400)">${m.especialidade} · ${m.crm}</div>
+          </div>
+          <span class="badge badge-green" style="margin-left:auto">${STATE.agendamentos.filter(a=>a.medicoId===m.id&&a.data===hoje).length} hoje</span>
+        </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+function statusBadge(s) {
+  return {agendado:'badge-gray',confirmado:'badge-blue',concluido:'badge-green',cancelado:'badge-red'}[s]||'badge-gray';
+}
+
+// === AGENDA SEMANAL ===
+function renderAgenda() {
+  const days = weekDays();
+  const horas = ['08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00'];
+  const filtMedico = STATE.searchTerms['agenda-medico'] || '';
+  const agFiltrados = filtMedico ? STATE.agendamentos.filter(a => a.medicoId === parseInt(filtMedico)) : STATE.agendamentos;
+  return `
+  <div class="page-header">
+    <div><div class="page-title">Agenda Semanal</div><div class="page-sub">Semana de 06 a 12 de abril de 2025</div></div>
+    <div class="flex-row">
+      <select class="form-select" style="width:200px" onchange="setState('searchTerms','agenda-medico',this.value)">
+        <option value="">Todos os médicos</option>
+        ${STATE.medicos.map(m=>`<option value="${m.id}" ${filtMedico==m.id?'selected':''}>${m.nome}</option>`).join('')}
+      </select>
+      <button class="btn btn-green" onclick="openModal('agendamento')">+ Novo</button>
+    </div>
+  </div>
+  <div style="overflow-x:auto">
+    <div class="week-grid" style="min-width:800px">
+      <div class="week-header"></div>
+      ${days.map(d=>`<div class="week-header">${diaSemana(d)}<br><span style="font-weight:400;font-size:11px">${fmtDate(d)}</span></div>`).join('')}
+      ${horas.map(h=>`
+        <div class="week-time">${h}</div>
+        ${days.map(d=>{
+          const ags = agFiltrados.filter(a=>a.data===d&&a.hora===h);
+          return `<div class="week-cell">${ags.map(a=>`
+            <div class="week-event" title="${getPaciente(a.pacienteId).nome} - ${getMedico(a.medicoId).nome}" onclick="openModal('ver-ag',${a.id})">
+              ${getPaciente(a.pacienteId).nome?.split(' ')[0]}<br>
+              <span style="font-size:10px;opacity:.8">${getMedico(a.medicoId).nome?.split(' ').slice(0,2).join(' ')}</span>
+            </div>`).join('')}</div>`;
+        }).join('')}`).join('')}
+    </div>
+  </div>`;
+}
+
+// === AGENDAMENTOS ===
+function renderAgendamento() {
+  const term = STATE.searchTerms['ag'] || '';
+  const unId = STATE.currentUnidade?.id;
+  const filtrado = STATE.agendamentos.filter(a => {
+    if (unId && a.unidadeId && a.unidadeId !== unId) return false;
+    const p = getPaciente(a.pacienteId).nome?.toLowerCase() || '';
+    const m = getMedico(a.medicoId).nome?.toLowerCase() || '';
+    return !term || p.includes(term.toLowerCase()) || m.includes(term.toLowerCase());
+  });
+  return `
+  <div class="page-header">
+    <div><div class="page-title">Agendamentos</div><div class="page-sub">${filtrado.length} consultas</div></div>
+    <div class="flex-row">
+      <input class="search-input" placeholder="Buscar paciente ou médico..." value="${term}" oninput="setState('searchTerms','ag',this.value)">
+      <button class="btn btn-green" onclick="openModal('agendamento')">+ Novo agendamento</button>
+    </div>
+  </div>
+  <div class="card" style="padding:0;overflow:hidden">
+    <table class="data-table">
+      <thead><tr><th>Data/Hora</th><th>Paciente</th><th>Médico</th><th>Unidade</th><th>Tipo</th><th>Valor</th><th>Status</th><th>Pgto</th><th></th></tr></thead>
+      <tbody>
+        ${filtrado.sort((a,b)=>a.data.localeCompare(b.data)||a.hora.localeCompare(b.hora)).map(a=>`
+          <tr>
+            <td><b>${fmtDate(a.data)}</b> ${a.hora}</td>
+            <td>${getPaciente(a.pacienteId).nome}</td>
+            <td>${getMedico(a.medicoId).nome?.split(' ').slice(0,2).join(' ')}</td>
+            <td>${STATE.unidades.find(u=>u.id===a.unidadeId)?.nome||'—'}</td>
+            <td>${a.tipo}</td>
+            <td>${fmtCurrency(a.valor)}</td>
+            <td><span class="badge ${statusBadge(a.status)}">${a.status}</span></td>
+            <td><span class="badge ${a.pago?'badge-green':'badge-amber'}">${a.pago?'Pago':'Pendente'}</span></td>
+            <td><div class="flex-row">
+              <button class="btn btn-outline btn-sm" onclick="openModal('ver-ag',${a.id})">Ver</button>
+              ${!a.pago&&(STATE.currentUser.perfil==='colaborador'||STATE.currentUser.perfil==='supervisor')?`<button class="btn btn-green btn-sm" onclick="openModal('receber',${a.id})">Receber</button>`:''}
+              ${STATE.currentUser.perfil==='supervisor'?`<button class="btn btn-red btn-sm" onclick="deleteAg(${a.id})">✕</button>`:''}
+            </div></td>
+          </tr>`).join('')}
+      </tbody>
+    </table>
+    ${filtrado.length===0?'<div class="empty-state"><p>Nenhum agendamento encontrado</p></div>':''}
+  </div>`;
+}
+
+// === MÉDICOS ===
+function renderMedicos() {
+  return `
+  <div class="page-header">
+    <div><div class="page-title">Médicos</div><div class="page-sub">${STATE.medicos.length} cadastrados</div></div>
+    <button class="btn btn-green" onclick="openModal('medico')">+ Novo médico</button>
+  </div>
+  <div class="grid-3">
+    ${STATE.medicos.map(m=>`
+      <div class="card" style="cursor:pointer" onclick="openModal('medico-detalhe',${m.id})">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+          <div class="avatar" style="width:44px;height:44px;font-size:15px;background:${m.cor}22;color:${m.cor}">${m.nome.split(' ').map(n=>n[0]).slice(0,2).join('')}</div>
+          <div>
+            <div style="font-weight:600;font-size:14px">${m.nome}</div>
+            <div style="font-size:12px;color:var(--gray-400)">${m.crm}</div>
+          </div>
+        </div>
+        <div style="font-size:13px;margin-bottom:8px"><span class="badge badge-green">${m.especialidade}</span></div>
+        <div style="font-size:12px;color:var(--gray-400)">${m.telefone}</div>
+        <div style="font-size:12px;color:var(--gray-400)">${m.email}</div>
+        ${m.exigencias?.length?`<div style="margin-top:10px;font-size:11px;color:var(--gray-400)">${m.exigencias.length} exigência(s) cadastrada(s)</div>`:''}
+      </div>`).join('')}
+  </div>`;
+}
+
+// === PACIENTES ===
+function renderPacientes() {
+  const term = STATE.searchTerms['pac'] || '';
+  const filtrado = STATE.pacientes.filter(p => !term || p.nome.toLowerCase().includes(term.toLowerCase()) || p.cpf.includes(term));
+  return `
+  <div class="page-header">
+    <div><div class="page-title">Pacientes</div><div class="page-sub">${filtrado.length} registros</div></div>
+    <div class="flex-row">
+      <input class="search-input" placeholder="Buscar por nome ou CPF..." value="${term}" oninput="setState('searchTerms','pac',this.value)">
+      <button class="btn btn-green" onclick="openModal('paciente')">+ Novo paciente</button>
+    </div>
+  </div>
+  <div class="card" style="padding:0;overflow:hidden">
+    <table class="data-table">
+      <thead><tr><th>Paciente</th><th>CPF</th><th>Nascimento</th><th>Telefone</th><th>Convênio</th><th></th></tr></thead>
+      <tbody>
+        ${filtrado.map(p=>`
+          <tr>
+            <td><div class="flex-row"><div class="avatar" style="width:30px;height:30px;font-size:11px">${p.nome.split(' ').map(n=>n[0]).slice(0,2).join('')}</div> ${p.nome}</div></td>
+            <td style="color:var(--gray-400)">${p.cpf}</td>
+            <td>${fmtDate(p.dataNasc)}</td>
+            <td>${p.telefone}</td>
+            <td><span class="badge badge-gray">${p.convenio||'—'}</span></td>
+            <td><div class="flex-row">
+              <button class="btn btn-outline btn-sm" onclick="openModal('paciente',${p.id})">Editar</button>
+              <button class="btn btn-green btn-sm" onclick="openModal('prontuario-novo',${p.id})">Prontuário</button>
+            </div></td>
+          </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>`;
+}
+
+// === PRONTUÁRIOS ===
+function renderProntuarios() {
+  const tab = STATE.activeTab['pront'] || 'lista';
+  return `
+  <div class="page-header">
+    <div><div class="page-title">Prontuários</div></div>
+    <button class="btn btn-green" onclick="openModal('prontuario-novo',null)">+ Novo prontuário</button>
+  </div>
+  <div class="card" style="padding:0;overflow:hidden">
+    <table class="data-table">
+      <thead><tr><th>Paciente</th><th>Médico</th><th>Data</th><th>Queixa Principal</th><th></th></tr></thead>
+      <tbody>
+        ${STATE.prontuarios.map(pr=>`
+          <tr>
+            <td>${getPaciente(pr.pacienteId).nome}</td>
+            <td>${getMedico(pr.medicoId).nome?.split(' ').slice(0,2).join(' ')}</td>
+            <td>${fmtDate(pr.data)}</td>
+            <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${pr.queixa}</td>
+            <td><button class="btn btn-outline btn-sm" onclick="openModal('prontuario-ver',${pr.id})">Abrir</button></td>
+          </tr>`).join('')}
+      </tbody>
+    </table>
+    ${STATE.prontuarios.length===0?'<div class="empty-state"><p>Nenhum prontuário cadastrado</p></div>':''}
+  </div>`;
+}
+
+// === FINANCEIRO ===
+function gerarPDFCaixa(caixaId) {
+  const c = STATE.caixas.find(x => x.id === caixaId) || STATE.caixas.find(x => !x.fechado && x.colaboradorId === STATE.currentUser.id);
+  if (!c) { alert('Nenhum caixa encontrado.'); return; }
+  const col = getUser(c.colaboradorId);
+  const linhas = c.itens.map(item => {
+    const ag = STATE.agendamentos.find(a => a.id === item.agendamentoId) || {};
+    const pac = getPaciente(ag.pacienteId);
+    const med = getMedico(ag.medicoId);
+    return `<tr>
+      <td style="padding:6px 10px;border-bottom:1px solid #eee">${item.hora}</td>
+      <td style="padding:6px 10px;border-bottom:1px solid #eee">${pac.nome || '—'}</td>
+      <td style="padding:6px 10px;border-bottom:1px solid #eee">${med.nome?.split(' ').slice(0,2).join(' ') || '—'}</td>
+      <td style="padding:6px 10px;border-bottom:1px solid #eee">${ag.tipo || '—'}</td>
+      <td style="padding:6px 10px;border-bottom:1px solid #eee">${item.forma}</td>
+      <td style="padding:6px 10px;border-bottom:1px solid #eee;text-align:right"><b>R$ ${parseFloat(item.valor).toFixed(2).replace('.',',')}</b></td>
+    </tr>`;
+  }).join('');
+  const win = window.open('', '_blank');
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+    <title>Fechamento de Caixa — ${fmtDate(c.data)}</title>
+    <style>body{font-family:Arial,sans-serif;color:#222;padding:32px;max-width:800px;margin:0 auto}
+    h1{color:#3B6D11;font-size:22px;margin-bottom:4px}
+    .sub{color:#888;font-size:13px;margin-bottom:24px}
+    table{width:100%;border-collapse:collapse}
+    th{background:#3B6D11;color:white;padding:8px 10px;text-align:left;font-size:13px}
+    .total{text-align:right;font-size:18px;font-weight:bold;color:#3B6D11;margin-top:20px;padding-top:12px;border-top:2px solid #3B6D11}
+    .footer{margin-top:40px;font-size:12px;color:#aaa;text-align:center}
+    @media print{button{display:none}}</style>
+  </head><body>
+    <h1>Fechamento de Caixa</h1>
+    <div class="sub">Data: ${fmtDate(c.data)} &nbsp;|&nbsp; Colaborador: ${col.nome} &nbsp;|&nbsp; Status: ${c.fechado ? 'Fechado' : 'Aberto'}</div>
+    <button onclick="window.print()" style="background:#639922;color:white;border:none;padding:8px 20px;border-radius:6px;cursor:pointer;font-size:14px;margin-bottom:20px">🖨️ Imprimir / Salvar PDF</button>
+    <table>
+      <thead><tr><th>Hora</th><th>Paciente</th><th>Médico</th><th>Tipo</th><th>Forma Pgto</th><th>Valor</th></tr></thead>
+      <tbody>${linhas || '<tr><td colspan="6" style="padding:12px;text-align:center;color:#aaa">Nenhum recebimento</td></tr>'}</tbody>
+    </table>
+    <div class="total">Total Recebido: R$ ${parseFloat(c.total).toFixed(2).replace('.',',')}</div>
+    <div class="footer">Gerado em ${new Date().toLocaleString('pt-BR')} — HemoLab Sistema de Gestão</div>
+  </body></html>`);
+  win.document.close();
+}
+
+function gerarRelatorioMensal() {
+  const mes = document.getElementById('rel-mes')?.value || new Date().toISOString().slice(0,7);
+  const [ano, mesNum] = mes.split('-');
+  const agsMes = STATE.agendamentos.filter(a => a.data.startsWith(mes));
+  const totalMes = agsMes.filter(a => a.pago).reduce((s,a) => s+a.valor, 0);
+  const totalPend = agsMes.filter(a => !a.pago).reduce((s,a) => s+a.valor, 0);
+
+  const porMedico = {};
+  agsMes.forEach(a => {
+    const m = getMedico(a.medicoId);
+    if (!porMedico[a.medicoId]) porMedico[a.medicoId] = { nome: m.nome, qtd: 0, recebido: 0 };
+    porMedico[a.medicoId].qtd++;
+    if (a.pago) porMedico[a.medicoId].recebido += a.valor;
+  });
+
+  const linhasAgs = agsMes.sort((a,b) => a.data.localeCompare(b.data)||a.hora.localeCompare(b.hora)).map(a => {
+    const pac = getPaciente(a.pacienteId);
+    const med = getMedico(a.medicoId);
+    return `<tr>
+      <td style="padding:6px 10px;border-bottom:1px solid #eee">${fmtDate(a.data)}</td>
+      <td style="padding:6px 10px;border-bottom:1px solid #eee">${a.hora}</td>
+      <td style="padding:6px 10px;border-bottom:1px solid #eee">${pac.nome || '—'}</td>
+      <td style="padding:6px 10px;border-bottom:1px solid #eee">${med.nome?.split(' ').slice(0,2).join(' ') || '—'}</td>
+      <td style="padding:6px 10px;border-bottom:1px solid #eee">${a.tipo}</td>
+      <td style="padding:6px 10px;border-bottom:1px solid #eee;text-align:center">
+        <span style="background:${a.pago?'#EAF3DE':'#FAEEDA'};color:${a.pago?'#3B6D11':'#BA7517'};padding:2px 8px;border-radius:10px;font-size:11px">${a.pago?'Pago':'Pendente'}</span>
+      </td>
+      <td style="padding:6px 10px;border-bottom:1px solid #eee;text-align:right"><b>R$ ${parseFloat(a.valor).toFixed(2).replace('.',',')}</b></td>
+    </tr>`;
+  }).join('');
+
+  const linhasMed = Object.values(porMedico).map(m => `<tr>
+    <td style="padding:6px 10px;border-bottom:1px solid #eee">${m.nome}</td>
+    <td style="padding:6px 10px;border-bottom:1px solid #eee;text-align:center">${m.qtd}</td>
+    <td style="padding:6px 10px;border-bottom:1px solid #eee;text-align:right"><b>R$ ${parseFloat(m.recebido).toFixed(2).replace('.',',')}</b></td>
+  </tr>`).join('');
+
+  const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  const nomeMes = meses[parseInt(mesNum)-1] + ' ' + ano;
+
+  const win = window.open('', '_blank');
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+    <title>Relatório Mensal — ${nomeMes}</title>
+    <style>body{font-family:Arial,sans-serif;color:#222;padding:32px;max-width:900px;margin:0 auto}
+    h1{color:#3B6D11;font-size:24px;margin-bottom:4px}h2{color:#3B6D11;font-size:16px;margin:28px 0 10px}
+    .sub{color:#888;font-size:13px;margin-bottom:24px}
+    .stats{display:flex;gap:20px;margin-bottom:28px}
+    .stat{background:#EAF3DE;border-radius:8px;padding:14px 20px;flex:1}
+    .stat-v{font-size:24px;font-weight:bold;color:#3B6D11}.stat-l{font-size:12px;color:#639922}
+    table{width:100%;border-collapse:collapse}
+    th{background:#3B6D11;color:white;padding:8px 10px;text-align:left;font-size:13px}
+    .footer{margin-top:40px;font-size:12px;color:#aaa;text-align:center}
+    @media print{button{display:none}}</style>
+  </head><body>
+    <h1>Relatório Mensal — ${nomeMes}</h1>
+    <div class="sub">Gerado em ${new Date().toLocaleString('pt-BR')}</div>
+    <button onclick="window.print()" style="background:#639922;color:white;border:none;padding:8px 20px;border-radius:6px;cursor:pointer;font-size:14px;margin-bottom:24px">🖨️ Imprimir / Salvar PDF</button>
+    <div class="stats">
+      <div class="stat"><div class="stat-l">Total de Consultas</div><div class="stat-v">${agsMes.length}</div></div>
+      <div class="stat"><div class="stat-l">Total Recebido</div><div class="stat-v">R$ ${parseFloat(totalMes).toFixed(2).replace('.',',')}</div></div>
+      <div class="stat"><div class="stat-l">A Receber</div><div class="stat-v" style="color:#BA7517">R$ ${parseFloat(totalPend).toFixed(2).replace('.',',')}</div></div>
+    </div>
+    <h2>Resumo por Médico</h2>
+    <table><thead><tr><th>Médico</th><th style="text-align:center">Consultas</th><th style="text-align:right">Recebido</th></tr></thead>
+    <tbody>${linhasMed || '<tr><td colspan="3" style="padding:12px;text-align:center;color:#aaa">Sem dados</td></tr>'}</tbody></table>
+    <h2>Todas as Consultas do Mês</h2>
+    <table><thead><tr><th>Data</th><th>Hora</th><th>Paciente</th><th>Médico</th><th>Tipo</th><th style="text-align:center">Pgto</th><th style="text-align:right">Valor</th></tr></thead>
+    <tbody>${linhasAgs || '<tr><td colspan="7" style="padding:12px;text-align:center;color:#aaa">Sem consultas neste mês</td></tr>'}</tbody></table>
+    <div class="footer">HemoLab — Sistema de Gestão do Dr. Alexson Carvalho</div>
+  </body></html>`);
+  win.document.close();
+}
+
+function renderFinanceiro() {
+  const hoje = new Date().toISOString().split('T')[0];
+  let caixaHoje = STATE.caixas.find(c => c.data === hoje && c.colaboradorId === STATE.currentUser.id && !c.fechado);
+  if (STATE.currentUser.perfil === 'supervisor') caixaHoje = STATE.caixas.find(c => c.data === hoje && !c.fechado);
+  const agPendentes = STATE.agendamentos.filter(a => a.data <= hoje && !a.pago && a.status !== 'cancelado');
+  const totalAberto = agPendentes.reduce((s,a)=>s+a.valor,0);
+  return `
+  <div class="page-header">
+    <div><div class="page-title">Caixa do Dia</div><div class="page-sub">${fmtDate(hoje)}</div></div>
+    <div class="flex-row">
+      ${!caixaHoje?`<button class="btn btn-green" onclick="abrirCaixa()">Abrir Caixa</button>`:`
+        <button class="btn btn-outline" onclick="gerarPDFCaixa(null)">📄 Exportar Caixa</button>
+        <button class="btn btn-red" onclick="fecharCaixa()">Fechar e Gerar Arquivo</button>
+      `}
+    </div>
+  </div>
+  ${!caixaHoje?`
+    <div class="card" style="text-align:center;padding:40px">
+      <div style="font-size:40px;margin-bottom:12px">💰</div>
+      <div style="font-size:16px;font-weight:600;margin-bottom:8px">Caixa não aberto</div>
+      <div style="font-size:14px;color:var(--gray-400)">Abra o caixa para registrar recebimentos</div>
+    </div>
+  `:`
+  <div class="grid-2" style="margin-bottom:20px">
+    <div class="caixa-card">
+      <div style="font-size:12px;color:var(--gray-400);margin-bottom:6px">Total Recebido</div>
+      <div class="caixa-total">${fmtCurrency(caixaHoje.total)}</div>
+    </div>
+    <div class="caixa-card">
+      <div style="font-size:12px;color:var(--gray-400);margin-bottom:6px">A Receber</div>
+      <div class="caixa-total" style="color:var(--amber-400)">${fmtCurrency(totalAberto)}</div>
+    </div>
+  </div>
+  <div class="card" style="margin-bottom:20px">
+    <div class="card-title">Recebimentos do Caixa</div>
+    ${caixaHoje.itens.length===0?'<div style="text-align:center;color:var(--gray-400);padding:20px">Nenhum recebimento ainda</div>':
+    `<table class="data-table">
+      <thead><tr><th>Hora</th><th>Paciente</th><th>Médico</th><th>Forma Pgto</th><th>Valor</th></tr></thead>
+      <tbody>${caixaHoje.itens.map(item=>{
+        const ag = STATE.agendamentos.find(a=>a.id===item.agendamentoId)||{};
+        return `<tr>
+          <td>${item.hora}</td>
+          <td>${getPaciente(ag.pacienteId).nome||'—'}</td>
+          <td>${getMedico(ag.medicoId).nome?.split(' ').slice(0,2).join(' ')||'—'}</td>
+          <td><span class="badge badge-blue">${item.forma}</span></td>
+          <td><b>${fmtCurrency(item.valor)}</b></td>
+        </tr>`;}).join('')}
+      </tbody>
+    </table>`}
+  </div>
+  <div class="card">
+    <div class="card-title">Consultas a Receber Hoje</div>
+    ${agPendentes.length===0?'<div style="color:var(--gray-400);font-size:14px">Tudo recebido!</div>':
+    agPendentes.map(a=>`
+      <div class="financeiro-row">
+        <div>
+          <div style="font-size:14px;font-weight:500">${getPaciente(a.pacienteId).nome}</div>
+          <div style="font-size:12px;color:var(--gray-400)">${getMedico(a.medicoId).nome?.split(' ').slice(0,2).join(' ')} · ${a.tipo} · ${fmtDate(a.data)} ${a.hora}</div>
+        </div>
+        <div class="flex-row">
+          <span style="font-weight:600;color:var(--gray-800)">${fmtCurrency(a.valor)}</span>
+          <button class="btn btn-green btn-sm" onclick="openModal('receber',${a.id})">Receber</button>
+        </div>
+      </div>`).join('')}
+  </div>`}`;
+}
+
+// === CAIXAS (RELATÓRIO) ===
+function renderCaixas() {
+  const unId = STATE.currentUnidade?.id;
+  const caixas = (STATE.currentUser.perfil === 'supervisor_financeiro' || STATE.currentUser.perfil === 'supervisor'
+    ? STATE.caixas : STATE.caixas.filter(c => c.colaboradorId === STATE.currentUser.id))
+    .filter(c => !unId || !c.unidadeId || c.unidadeId === unId);
+  return `
+  <div class="page-header">
+    <div><div class="page-title">Relatório de Caixas</div><div class="page-sub">${caixas.length} caixas registrados</div></div>
+    <div class="flex-row">
+      <input type="month" class="form-input" id="rel-mes" style="width:160px" value="2025-04">
+      <button class="btn btn-green" onclick="gerarRelatorioMensal()">📊 Relatório Mensal</button>
+    </div>
+  </div>
+  <div class="card" style="padding:0;overflow:hidden">
+    <table class="data-table">
+      <thead><tr><th>Data</th><th>Colaborador</th><th>Qtd Recebimentos</th><th>Total</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+        ${caixas.map(c=>`
+          <tr>
+            <td>${fmtDate(c.data)}</td>
+            <td>${getUser(c.colaboradorId).nome||'—'}</td>
+            <td>${c.itens.length}</td>
+            <td><b style="color:var(--green-400)">${fmtCurrency(c.total)}</b></td>
+            <td><span class="badge ${c.fechado?'badge-green':'badge-amber'}">${c.fechado?'Fechado':'Aberto'}</span></td>
+            <td><div class="flex-row">
+              <button class="btn btn-outline btn-sm" onclick="openModal('ver-caixa',${c.id})">Detalhes</button>
+              <button class="btn btn-green btn-sm" onclick="gerarPDFCaixa(${c.id})">📄 PDF</button>
+            </div></td>
+          </tr>`).join('')}
+      </tbody>
+    </table>
+    ${caixas.length===0?'<div class="empty-state"><p>Nenhum caixa registrado</p></div>':''}
+  </div>`;
+}
+
+// === UNIDADES ===
+function renderUnidades() {
+  return `
+  <div class="page-header">
+    <div><div class="page-title">Unidades</div><div class="page-sub">${STATE.unidades.length} unidade(s) cadastrada(s)</div></div>
+    <button class="btn btn-green" onclick="openModal('unidade')">+ Nova unidade</button>
+  </div>
+  <div class="grid-3">
+    ${STATE.unidades.map(un=>`
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+          <div style="width:44px;height:44px;background:var(--green-50);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg viewBox="0 0 24 24" fill="#639922" width="22" height="22"><path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"/></svg>
+          </div>
+          <div>
+            <div style="font-size:15px;font-weight:600">${un.nome}</div>
+            <div style="font-size:12px;color:var(--gray-400)">${un.endereco||'Sem endereço'}</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <span class="badge ${un.ativo?'badge-green':'badge-red'}">${un.ativo?'Ativa':'Inativa'}</span>
+          <div class="flex-row">
+            <button class="btn btn-outline btn-sm" onclick="openModal('unidade',${un.id})">Editar</button>
+            <button class="btn btn-red btn-sm" onclick="toggleUnidade(${un.id})">${un.ativo?'Desativar':'Ativar'}</button>
+          </div>
+        </div>
+      </div>`).join('')}
+  </div>`;
+}
+
+// === USUÁRIOS ===
+function renderUsuarios() {
+  return `
+  <div class="page-header">
+    <div><div class="page-title">Usuários</div><div class="page-sub">${STATE.users.length} cadastrados</div></div>
+    <button class="btn btn-green" onclick="openModal('usuario')">+ Novo usuário</button>
+  </div>
+  <div class="card" style="padding:0;overflow:hidden">
+    <table class="data-table">
+      <thead><tr><th>Nome</th><th>E-mail</th><th>Perfil</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+        ${STATE.users.map(u=>`
+          <tr>
+            <td><div class="flex-row"><div class="avatar" style="width:30px;height:30px;font-size:11px">${u.nome.split(' ').map(n=>n[0]).slice(0,2).join('')}</div>${u.nome}</div></td>
+            <td style="color:var(--gray-400)">${u.email}</td>
+            <td><span class="badge ${u.perfil==='supervisor'?'badge-green':u.perfil==='supervisor_financeiro'?'badge-blue':'badge-gray'}">${perfilLabel(u.perfil)}</span></td>
+            <td><span class="badge ${u.ativo?'badge-green':'badge-red'}">${u.ativo?'Ativo':'Inativo'}</span></td>
+            <td><div class="flex-row">
+              <button class="btn btn-outline btn-sm" onclick="openModal('usuario',${u.id})">Editar</button>
+              ${u.id!==STATE.currentUser.id?`<button class="btn btn-red btn-sm" onclick="toggleUser(${u.id})">${u.ativo?'Desativar':'Ativar'}</button>`:''}
+            </div></td>
+          </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>`;
+}
+
+// ===== MODALS =====
+function renderModal() {
+  const { type, id } = STATE.modalOpen;
+  const fns = {
+    'agendamento': modalAgendamento,
+    'ver-ag': modalVerAg,
+    'receber': modalReceber,
+    'medico': modalMedico,
+    'medico-detalhe': modalMedicoDetalhe,
+    'paciente': modalPaciente,
+    'prontuario-novo': modalProntuarioNovo,
+    'prontuario-ver': modalProntuarioVer,
+    'usuario': modalUsuario,
+    'unidade': modalUnidade,
+    'ver-caixa': modalVerCaixa,
+  };
+  const fn = fns[type];
+  if (!fn) return '';
+  return `<div class="modal-overlay" onclick="closeModalOutside(event)">${fn(id)}</div>`;
+}
+
+function modalAgendamento(id) {
+  const ag = id ? STATE.agendamentos.find(a=>a.id===id) : null;
+  const modoNovoPac = !ag;
+  return `<div class="modal" onclick="e=>e.stopPropagation()">
+    <div class="modal-title">${ag?'Editar':'Novo'} Agendamento</div>
+
+    ${!ag ? `
+    <div style="background:var(--green-50);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:16px">
+      <div style="font-size:12px;font-weight:600;color:var(--green-600);margin-bottom:10px">Paciente</div>
+      <div class="tab-bar" style="margin-bottom:12px">
+        <button class="tab-btn active" id="tab-pac-existente" onclick="toggleTabPac('existente')">Paciente existente</button>
+        <button class="tab-btn" id="tab-pac-novo" onclick="toggleTabPac('novo')">Novo paciente</button>
+      </div>
+      <div id="sec-pac-existente">
+        <label class="form-label">Selecionar paciente</label>
+        <select class="form-select" id="ag-pac">
+          <option value="">— Selecione —</option>
+          ${STATE.pacientes.map(p=>`<option value="${p.id}">${p.nome} · ${p.telefone}</option>`).join('')}
+        </select>
+      </div>
+      <div id="sec-pac-novo" style="display:none">
+        <div class="form-row" style="margin-bottom:0">
+          <div class="form-group-inline"><label class="form-label">Nome completo <span style="color:var(--red-400)">*</span></label><input class="form-input" id="novo-pac-nome" placeholder="Nome do paciente"></div>
+          <div class="form-group-inline"><label class="form-label">Telefone <span style="color:var(--red-400)">*</span></label><input class="form-input" id="novo-pac-tel" placeholder="(00) 00000-0000"></div>
+        </div>
+      </div>
+    </div>
+    ` : `
+    <div class="form-group-inline"><label class="form-label">Paciente</label>
+      <select class="form-select" id="ag-pac">${STATE.pacientes.map(p=>`<option value="${p.id}" ${ag?.pacienteId===p.id?'selected':''}>${p.nome}</option>`).join('')}</select>
+    </div>`}
+
+    <div class="form-group-inline"><label class="form-label">Médico</label>
+      <select class="form-select" id="ag-med">${STATE.medicos.map(m=>`<option value="${m.id}" ${ag?.medicoId===m.id?'selected':''}>${m.nome}</option>`).join('')}</select>
+    </div>
+    <div class="form-row">
+      <div class="form-group-inline"><label class="form-label">Data</label><input class="form-input" id="ag-data" type="date" value="${ag?.data||'2025-04-07'}"></div>
+      <div class="form-group-inline"><label class="form-label">Hora</label><input class="form-input" id="ag-hora" type="time" value="${ag?.hora||'09:00'}"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group-inline"><label class="form-label">Tipo</label>
+        <select class="form-select" id="ag-tipo">
+          ${['Consulta','Retorno','Exame','Procedimento'].map(t=>`<option ${ag?.tipo===t?'selected':''}>${t}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group-inline"><label class="form-label">Valor (R$)</label><input class="form-input" id="ag-valor" type="number" value="${ag?.valor||250}"></div>
+    </div>
+    <div class="form-group-inline"><label class="form-label">Status</label>
+      <select class="form-select" id="ag-status">${['agendado','confirmado','cancelado'].map(s=>`<option value="${s}" ${ag?.status===s?'selected':''}>${s}</option>`).join('')}</select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-green" onclick="saveAgendamento(${id||'null'})">Salvar</button>
+    </div>
+  </div>`;
+}
+
+function modalVerAg(id) {
+  const ag = STATE.agendamentos.find(a=>a.id===id);
+  if (!ag) return '<div class="modal"><p>Não encontrado</p></div>';
+  const p = getPaciente(ag.pacienteId);
+  const m = getMedico(ag.medicoId);
+  return `<div class="modal">
+    <div class="modal-title">Detalhes do Agendamento</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+      <div><div style="font-size:11px;color:var(--gray-400)">PACIENTE</div><div style="font-weight:500">${p.nome}</div></div>
+      <div><div style="font-size:11px;color:var(--gray-400)">MÉDICO</div><div style="font-weight:500">${m.nome}</div></div>
+      <div><div style="font-size:11px;color:var(--gray-400)">DATA/HORA</div><div style="font-weight:500">${fmtDate(ag.data)} às ${ag.hora}</div></div>
+      <div><div style="font-size:11px;color:var(--gray-400)">TIPO</div><div style="font-weight:500">${ag.tipo}</div></div>
+      <div><div style="font-size:11px;color:var(--gray-400)">VALOR</div><div style="font-weight:500;color:var(--green-400)">${fmtCurrency(ag.valor)}</div></div>
+      <div><div style="font-size:11px;color:var(--gray-400)">STATUS</div><span class="badge ${statusBadge(ag.status)}">${ag.status}</span></div>
+    </div>
+    ${m.exigencias?.length?`<div style="background:var(--green-50);border-radius:var(--radius-sm);padding:12px;margin-bottom:14px">
+      <div style="font-size:12px;font-weight:600;color:var(--green-600);margin-bottom:6px">Exigências do Médico</div>
+      ${m.exigencias.map(e=>`<div style="font-size:13px;color:var(--green-800)">• ${e}</div>`).join('')}
+    </div>`:''}
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal()">Fechar</button>
+      ${!ag.pago?`<button class="btn btn-green" onclick="openModal('receber',${ag.id})">Receber Pagamento</button>`:'<span class="badge badge-green">✓ Pago</span>'}
+    </div>
+  </div>`;
+}
+
+function modalReceber(id) {
+  const ag = STATE.agendamentos.find(a=>a.id===id);
+  if (!ag) return '';
+  return `<div class="modal">
+    <div class="modal-title">Registrar Pagamento</div>
+    <div style="background:var(--gray-50);border-radius:var(--radius-sm);padding:14px;margin-bottom:16px">
+      <div style="font-size:13px;color:var(--gray-400)">Paciente: <b style="color:var(--gray-800)">${getPaciente(ag.pacienteId).nome}</b></div>
+      <div style="font-size:13px;color:var(--gray-400)">Consulta: <b style="color:var(--gray-800)">${ag.tipo} — ${fmtDate(ag.data)} ${ag.hora}</b></div>
+      <div style="font-size:22px;font-weight:600;color:var(--green-400);margin-top:8px">${fmtCurrency(ag.valor)}</div>
+    </div>
+    <div class="form-group-inline"><label class="form-label">Forma de Pagamento</label>
+      <select class="form-select" id="rec-forma">
+        <option>Dinheiro</option><option>Pix</option><option>Cartão de Débito</option><option>Cartão de Crédito</option><option>Convênio</option>
+      </select>
+    </div>
+    <div class="form-group-inline"><label class="form-label">Valor Recebido (R$)</label>
+      <input class="form-input" id="rec-valor" type="number" value="${ag.valor}">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-green" onclick="registrarPagamento(${id})">Confirmar Recebimento</button>
+    </div>
+  </div>`;
+}
+
+function modalMedico(id) {
+  const m = id ? STATE.medicos.find(x=>x.id===id) : null;
+  return `<div class="modal">
+    <div class="modal-title">${m?'Editar':'Novo'} Médico</div>
+    <div class="form-row">
+      <div class="form-group-inline"><label class="form-label">Nome Completo</label><input class="form-input" id="med-nome" value="${m?.nome||''}"></div>
+      <div class="form-group-inline"><label class="form-label">CRM</label><input class="form-input" id="med-crm" value="${m?.crm||''}"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group-inline"><label class="form-label">Especialidade</label><input class="form-input" id="med-esp" value="${m?.especialidade||''}"></div>
+      <div class="form-group-inline"><label class="form-label">Telefone</label><input class="form-input" id="med-tel" value="${m?.telefone||''}"></div>
+    </div>
+    <div class="form-group-inline"><label class="form-label">E-mail</label><input class="form-input" id="med-email" value="${m?.email||''}"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-green" onclick="saveMedico(${id||'null'})">Salvar</button>
+    </div>
+  </div>`;
+}
+
+function modalMedicoDetalhe(id) {
+  const m = STATE.medicos.find(x=>x.id===id);
+  if (!m) return '';
+  const exig = m.exigencias || [];
+  return `<div class="modal" style="width:620px">
+    <div class="modal-title">${m.nome}</div>
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px">
+      <div class="avatar" style="width:56px;height:56px;font-size:18px;background:${m.cor}22;color:${m.cor}">${m.nome.split(' ').map(n=>n[0]).slice(0,2).join('')}</div>
+      <div>
+        <div style="font-size:15px;font-weight:500">${m.crm}</div>
+        <span class="badge badge-green">${m.especialidade}</span>
+      </div>
+    </div>
+    <div class="form-row">
+      <div><div style="font-size:11px;color:var(--gray-400)">TELEFONE</div><div>${m.telefone}</div></div>
+      <div><div style="font-size:11px;color:var(--gray-400)">E-MAIL</div><div>${m.email}</div></div>
+    </div>
+    <hr class="section-divider">
+    <div style="font-size:14px;font-weight:600;margin-bottom:10px">Exigências nos Prontuários</div>
+    <div id="exig-list" style="margin-bottom:12px">
+      ${exig.map((e,i)=>`<div class="flex-row" style="margin-bottom:6px">
+        <span class="tag">${e} <span class="tag-remove" onclick="removeExig(${id},${i})">×</span></span>
+      </div>`).join('')}
+    </div>
+    <div class="flex-row">
+      <input class="form-input" id="nova-exig" placeholder="Nova exigência..." style="flex:1">
+      <button class="btn btn-green btn-sm" onclick="addExig(${id})">Adicionar</button>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="openModal('medico',${id})">Editar dados</button>
+      <button class="btn btn-green" onclick="closeModal()">Fechar</button>
+    </div>
+  </div>`;
+}
+
+function modalPaciente(id) {
+  const p = id ? STATE.pacientes.find(x=>x.id===id) : null;
+  return `<div class="modal">
+    <div class="modal-title">${p?'Editar':'Novo'} Paciente</div>
+    <div class="form-row">
+      <div class="form-group-inline"><label class="form-label">Nome Completo</label><input class="form-input" id="pac-nome" value="${p?.nome||''}"></div>
+      <div class="form-group-inline"><label class="form-label">CPF</label><input class="form-input" id="pac-cpf" value="${p?.cpf||''}"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group-inline"><label class="form-label">Data de Nascimento</label><input class="form-input" id="pac-nasc" type="date" value="${p?.dataNasc||''}"></div>
+      <div class="form-group-inline"><label class="form-label">Telefone</label><input class="form-input" id="pac-tel" value="${p?.telefone||''}"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group-inline"><label class="form-label">E-mail</label><input class="form-input" id="pac-email" value="${p?.email||''}"></div>
+      <div class="form-group-inline"><label class="form-label">Convênio</label><input class="form-input" id="pac-conv" value="${p?.convenio||''}"></div>
+    </div>
+    <div class="form-group-inline"><label class="form-label">Plano</label><input class="form-input" id="pac-plano" value="${p?.plano||''}"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-green" onclick="savePaciente(${id||'null'})">Salvar</button>
+    </div>
+  </div>`;
+}
+
+function modalProntuarioNovo(pacId) {
+  const campFixos = ['Pressão Arterial','Frequência Cardíaca','Temperatura','Peso','Altura','Glicemia'];
+  return `<div class="modal" style="width:640px">
+    <div class="modal-title">Novo Prontuário</div>
+    <div class="form-row">
+      <div class="form-group-inline"><label class="form-label">Paciente</label>
+        <select class="form-select" id="pr-pac">${STATE.pacientes.map(p=>`<option value="${p.id}" ${pacId&&p.id===pacId?'selected':''}>${p.nome}</option>`).join('')}</select>
+      </div>
+      <div class="form-group-inline"><label class="form-label">Médico</label>
+        <select class="form-select" id="pr-med">${STATE.medicos.map(m=>`<option value="${m.id}">${m.nome}</option>`).join('')}</select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group-inline"><label class="form-label">Data</label><input class="form-input" id="pr-data" type="date" value="2025-04-07"></div>
+    </div>
+    <div class="form-group-inline"><label class="form-label">Queixa Principal</label><textarea class="form-input" id="pr-queixa" rows="2" style="resize:vertical">${''}</textarea></div>
+    <div class="form-group-inline"><label class="form-label">Histórico / Anamnese</label><textarea class="form-input" id="pr-hist" rows="2" style="resize:vertical"></textarea></div>
+    <div class="form-group-inline"><label class="form-label">Exame Físico</label><textarea class="form-input" id="pr-exame" rows="2" style="resize:vertical"></textarea></div>
+    <div class="form-group-inline"><label class="form-label">Hipótese Diagnóstica</label><input class="form-input" id="pr-hip"></div>
+    <div class="form-group-inline"><label class="form-label">Conduta / Prescrição</label><textarea class="form-input" id="pr-conduta" rows="2" style="resize:vertical"></textarea></div>
+    <hr class="section-divider">
+    <div style="font-size:14px;font-weight:600;margin-bottom:10px">Campos do Médico</div>
+    <div id="pr-campos"></div>
+    <div class="flex-row" style="margin-top:8px">
+      <select class="form-select" id="pr-campo-sel" style="flex:1">
+        ${campFixos.map(c=>`<option>${c}</option>`).join('')}
+        <option value="__outro__">Outro (digitar)</option>
+      </select>
+      <input class="form-input" id="pr-campo-custom" placeholder="Rótulo personalizado" style="display:none;flex:1">
+      <button class="btn btn-green btn-sm" onclick="addCampoPront()">+ Campo</button>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-green" onclick="saveProntuario()">Salvar Prontuário</button>
+    </div>
+  </div>`;
+}
+
+function modalProntuarioVer(id) {
+  const pr = STATE.prontuarios.find(x=>x.id===id);
+  if (!pr) return '';
+  const p = getPaciente(pr.pacienteId);
+  const m = getMedico(pr.medicoId);
+  return `<div class="modal" style="width:640px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div class="modal-title" style="margin:0">Prontuário #${pr.id}</div>
+      <span style="font-size:13px;color:var(--gray-400)">${fmtDate(pr.data)}</span>
+    </div>
+    <div style="background:var(--gray-50);border-radius:var(--radius-sm);padding:12px;margin-bottom:16px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div><span style="font-size:11px;color:var(--gray-400)">PACIENTE</span><div style="font-weight:500">${p.nome}</div></div>
+      <div><span style="font-size:11px;color:var(--gray-400)">MÉDICO</span><div style="font-weight:500">${m.nome}</div></div>
+    </div>
+    <div class="prontuario-section">
+      <div class="prontuario-section-title">Queixa Principal</div>
+      <div id="pr-v-queixa" style="font-size:14px" contenteditable="true" class="form-input" style="min-height:40px">${pr.queixa}</div>
+    </div>
+    <div class="prontuario-section">
+      <div class="prontuario-section-title">Histórico / Anamnese</div>
+      <div id="pr-v-hist" contenteditable="true" class="form-input" style="min-height:40px;font-size:14px">${pr.historico}</div>
+    </div>
+    <div class="prontuario-section">
+      <div class="prontuario-section-title">Exame Físico</div>
+      <div id="pr-v-exame" contenteditable="true" class="form-input" style="min-height:40px;font-size:14px">${pr.exame}</div>
+    </div>
+    <div class="prontuario-section">
+      <div class="prontuario-section-title">Hipótese Diagnóstica</div>
+      <div id="pr-v-hip" contenteditable="true" class="form-input" style="font-size:14px">${pr.hipotese}</div>
+    </div>
+    <div class="prontuario-section">
+      <div class="prontuario-section-title">Conduta / Prescrição</div>
+      <div id="pr-v-conduta" contenteditable="true" class="form-input" style="min-height:40px;font-size:14px">${pr.conduta}</div>
+    </div>
+    ${pr.campos?.length?`<div class="prontuario-section">
+      <div class="prontuario-section-title">Campos do Médico</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        ${pr.campos.map(c=>`<div><div style="font-size:11px;color:var(--gray-400)">${c.label.toUpperCase()}</div><input class="form-input" value="${c.valor}" style="font-size:14px"></div>`).join('')}
+      </div>
+    </div>`:''}
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal()">Fechar</button>
+      <button class="btn btn-green" onclick="editProntuario(${id})">Salvar Edições</button>
+    </div>
+  </div>`;
+}
+
+function modalUnidade(id) {
+  const un = id ? STATE.unidades.find(x=>x.id===id) : null;
+  return `<div class="modal">
+    <div class="modal-title">${un?'Editar':'Nova'} Unidade</div>
+    <div class="form-group-inline" style="margin-bottom:14px"><label class="form-label">Nome da Unidade</label><input class="form-input" id="un-nome" value="${un?.nome||''}" placeholder="Ex: Posto Central"></div>
+    <div class="form-group-inline" style="margin-bottom:14px"><label class="form-label">Endereço</label><input class="form-input" id="un-end" value="${un?.endereco||''}" placeholder="Rua, número, bairro..."></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-green" onclick="saveUnidade(${id||'null'})">Salvar</button>
+    </div>
+  </div>`;
+}
+
+function modalUsuario(id) {
+  const u = id ? STATE.users.find(x=>x.id===id) : null;
+  return `<div class="modal">
+    <div class="modal-title">${u?'Editar':'Novo'} Usuário</div>
+    <div class="form-row">
+      <div class="form-group-inline"><label class="form-label">Nome</label><input class="form-input" id="us-nome" value="${u?.nome||''}"></div>
+      <div class="form-group-inline"><label class="form-label">E-mail</label><input class="form-input" id="us-email" type="email" value="${u?.email||''}"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group-inline"><label class="form-label">Senha</label><input class="form-input" id="us-senha" type="password" placeholder="${u?'Deixe em branco para manter':'Nova senha'}"></div>
+      <div class="form-group-inline"><label class="form-label">Perfil</label>
+        <select class="form-select" id="us-perfil" onchange="toggleUnidadesPerfil(this.value)">
+          <option value="colaborador" ${u?.perfil==='colaborador'?'selected':''}>Colaborador</option>
+          <option value="supervisor_financeiro" ${u?.perfil==='supervisor_financeiro'?'selected':''}>Supervisor Financeiro</option>
+          <option value="supervisor" ${u?.perfil==='supervisor'?'selected':''}>Supervisor</option>
+        </select>
+      </div>
+    </div>
+    <div id="sec-unidades-user" style="${u?.perfil==='supervisor'?'display:none':''}">
+      <div style="font-size:13px;font-weight:500;color:var(--gray-600);margin-bottom:8px">Unidades com acesso <span style="font-size:11px;color:var(--gray-400)">(deixe vazio para liberar todas)</span></div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        ${STATE.unidades.filter(un=>un.ativo).map(un=>`
+          <label style="display:flex;align-items:center;gap:6px;padding:6px 12px;border:1.5px solid var(--gray-200);border-radius:20px;cursor:pointer;font-size:13px">
+            <input type="checkbox" id="un-check-${un.id}" value="${un.id}" ${u?.unidades?.includes(un.id)?'checked':''} style="accent-color:#639922">
+            ${un.nome}
+          </label>`).join('')}
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-green" onclick="saveUsuario(${id||'null'})">Salvar</button>
+    </div>
+  </div>`;
+}
+
+function modalVerCaixa(id) {
+  const c = STATE.caixas.find(x=>x.id===id);
+  if (!c) return '';
+  return `<div class="modal">
+    <div class="modal-title">Caixa — ${fmtDate(c.data)}</div>
+    <div style="margin-bottom:14px">
+      <div style="font-size:12px;color:var(--gray-400)">COLABORADOR</div>
+      <div style="font-weight:500">${getUser(c.colaboradorId).nome}</div>
+    </div>
+    <table class="data-table" style="margin-bottom:16px">
+      <thead><tr><th>Hora</th><th>Forma</th><th>Valor</th></tr></thead>
+      <tbody>${c.itens.map(i=>`<tr>
+        <td>${i.hora}</td>
+        <td><span class="badge badge-blue">${i.forma}</span></td>
+        <td><b>${fmtCurrency(i.valor)}</b></td>
+      </tr>`).join('')}</tbody>
+    </table>
+    <div style="text-align:right;font-size:18px;font-weight:600;color:var(--green-400)">Total: ${fmtCurrency(c.total)}</div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal()">Fechar</button>
+    </div>
+  </div>`;
+}
+
+// ===== ACTIONS =====
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const senha = document.getElementById('login-senha').value;
+  const errEl = document.getElementById('login-error');
+  errEl.innerHTML = '<div class="alert" style="background:var(--gray-50);color:var(--gray-400)">Verificando...</div>';
+  try {
+    const { data, error } = await sb.from('usuarios').select('*').eq('email', email).eq('senha', senha).eq('ativo', true).single();
+    if (error || !data) {
+      errEl.innerHTML = '<div class="alert alert-error">E-mail ou senha incorretos</div>';
+      return;
+    }
+    STATE.currentUser = mapUser(data);
+    STATE.currentPage = 'dashboard';
+    await dbLoad();
+    render();
+  } catch(e) {
+    errEl.innerHTML = '<div class="alert alert-error">Erro de conexão. Tente novamente.</div>';
+  }
+}
+function doLogout() { STATE.currentUser = null; render(); }
+function goto(page) { STATE.currentPage = page; STATE.modalOpen = null; render(); }
+function openModal(type, id) { STATE.modalOpen = { type, id }; render(); }
+function closeModal() { STATE.modalOpen = null; render(); }
+function closeModalOutside(e) { if (e.target.classList.contains('modal-overlay')) closeModal(); }
+function setState(obj, key, val) { STATE[obj][key] = val; render(); }
+
+async function saveAgendamento(id) {
+  let pacienteId;
+  const secNovo = document.getElementById('sec-pac-novo');
+  const usandoNovo = secNovo && secNovo.style.display !== 'none';
+
+  if (usandoNovo) {
+    const nome = document.getElementById('novo-pac-nome').value.trim();
+    const tel = document.getElementById('novo-pac-tel').value.trim();
+    if (!nome || !tel) { alert('Informe o nome e telefone do paciente.'); return; }
+    const novoPac = { nome, telefone: tel, cpf: '', dataNasc: '', email: '', convenio: '', plano: '' };
+    await dbSavePaciente(novoPac);
+    STATE.pacientes.push(novoPac);
+    pacienteId = novoPac.id;
+  } else {
+    const sel = document.getElementById('ag-pac');
+    pacienteId = parseInt(sel.value);
+    if (!pacienteId) { alert('Selecione ou cadastre um paciente.'); return; }
+  }
+
+  const obj = {
+    pacienteId,
+    medicoId: parseInt(document.getElementById('ag-med').value),
+    data: document.getElementById('ag-data').value,
+    hora: document.getElementById('ag-hora').value,
+    tipo: document.getElementById('ag-tipo').value,
+    valor: parseFloat(document.getElementById('ag-valor').value),
+    status: document.getElementById('ag-status').value,
+    pago: false,
+    colaboradorId: STATE.currentUser.id,
+    unidadeId: STATE.currentUnidade?.id,
+  };
+  if (id) {
+    const i = STATE.agendamentos.findIndex(a=>a.id===id);
+    const updated = {...STATE.agendamentos[i],...obj, _dbId: STATE.agendamentos[i]._dbId || id};
+    STATE.agendamentos[i] = updated;
+    await dbSaveAg(updated);
+  } else {
+    const novo = {id: getId('agendamentos'), ...obj};
+    STATE.agendamentos.push(novo);
+    await dbSaveAg(novo);
+  }
+  closeModal();
+}
+function deleteAg(id) { STATE.agendamentos = STATE.agendamentos.filter(a=>a.id!==id); render(); }
+
+async function registrarPagamento(agId) {
+  const ag = STATE.agendamentos.find(a=>a.id===agId);
+  const forma = document.getElementById('rec-forma').value;
+  const valor = parseFloat(document.getElementById('rec-valor').value);
+  ag.pago = true;
+  ag.status = 'concluido';
+  await dbUpdateAg(ag._dbId || ag.id, { pago: true, status: 'concluido' });
+  const hoje = new Date().toISOString().split('T')[0];
+  let caixa = STATE.caixas.find(c => c.data === hoje && c.colaboradorId === STATE.currentUser.id && !c.fechado);
+  if (!caixa) {
+    caixa = { id: getId('caixas'), data: hoje, colaboradorId: STATE.currentUser.id, itens: [], fechado: false, total: 0 };
+    STATE.caixas.push(caixa);
+    await dbSaveCaixa(caixa);
+  }
+  const hora = new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  caixa.itens.push({ agendamentoId: ag._dbId || ag.id, valor, forma, hora });
+  caixa.total += valor;
+  await dbSaveCaixa(caixa);
+  closeModal();
+}
+
+async function abrirCaixa() {
+  const hoje = new Date().toISOString().split('T')[0];
+  const caixa = { id: getId('caixas'), data: hoje, colaboradorId: STATE.currentUser.id, itens: [], fechado: false, total: 0, unidadeId: STATE.currentUnidade?.id };
+  STATE.caixas.push(caixa);
+  await dbSaveCaixa(caixa);
+  render();
+}
+async function fecharCaixa() {
+  const hoje = new Date().toISOString().split('T')[0];
+  const caixa = STATE.caixas.find(c => c.data === hoje && !c.fechado && (c.colaboradorId === STATE.currentUser.id || STATE.currentUser.perfil === 'supervisor'));
+  if (caixa) {
+    caixa.fechado = true;
+    await dbSaveCaixa(caixa);
+    render();
+    if (confirm('Caixa fechado! Deseja gerar o arquivo de prestação de contas agora?')) {
+      gerarPDFCaixa(caixa.id);
+    }
+  }
+}
+
+async function saveMedico(id) {
+  const obj = {
+    nome: document.getElementById('med-nome').value,
+    crm: document.getElementById('med-crm').value,
+    especialidade: document.getElementById('med-esp').value,
+    telefone: document.getElementById('med-tel').value,
+    email: document.getElementById('med-email').value,
+    cor: '#639922',
+    exigencias: [],
+  };
+  if (id) {
+    const i = STATE.medicos.findIndex(m=>m.id===id);
+    const updated = {...STATE.medicos[i],...obj, _dbId: id};
+    STATE.medicos[i] = updated;
+    await dbSaveMedico(updated);
+  } else {
+    const novo = {id: getId('medicos'), ...obj};
+    STATE.medicos.push(novo);
+    await dbSaveMedico(novo);
+  }
+  closeModal();
+}
+
+async function addExig(medicoId) {
+  const m = STATE.medicos.find(x=>x.id===medicoId);
+  const val = document.getElementById('nova-exig').value.trim();
+  if (!val) return;
+  m.exigencias.push(val);
+  await sb.from('medicos').update({ exigencias: m.exigencias }).eq('id', medicoId);
+  openModal('medico-detalhe', medicoId);
+}
+async function removeExig(medicoId, idx) {
+  const m = STATE.medicos.find(x=>x.id===medicoId);
+  m.exigencias.splice(idx, 1);
+  await sb.from('medicos').update({ exigencias: m.exigencias }).eq('id', medicoId);
+  openModal('medico-detalhe', medicoId);
+}
+
+async function savePaciente(id) {
+  const obj = {
+    nome: document.getElementById('pac-nome').value,
+    cpf: document.getElementById('pac-cpf').value,
+    dataNasc: document.getElementById('pac-nasc').value,
+    telefone: document.getElementById('pac-tel').value,
+    email: document.getElementById('pac-email').value,
+    convenio: document.getElementById('pac-conv').value,
+    plano: document.getElementById('pac-plano').value,
+  };
+  if (id) {
+    const i = STATE.pacientes.findIndex(p=>p.id===id);
+    const updated = {...STATE.pacientes[i],...obj, _dbId: id};
+    STATE.pacientes[i] = updated;
+    await dbSavePaciente(updated);
+  } else {
+    const novo = {id: getId('pacientes'), ...obj};
+    STATE.pacientes.push(novo);
+    await dbSavePaciente(novo);
+  }
+  closeModal();
+}
+
+function addCampoPront() {
+  const sel = document.getElementById('pr-campo-sel').value;
+  const custom = document.getElementById('pr-campo-custom').value;
+  const label = sel === '__outro__' ? custom : sel;
+  if (!label) return;
+  const cont = document.getElementById('pr-campos');
+  const div = document.createElement('div');
+  div.className = 'flex-row';
+  div.style.marginBottom = '8px';
+  div.innerHTML = `<span style="min-width:140px;font-size:13px;color:var(--gray-600)">${label}:</span> <input class="form-input" data-campo="${label}" placeholder="Valor..." style="flex:1">`;
+  cont.appendChild(div);
+}
+
+async function saveProntuario() {
+  const campos = [];
+  document.querySelectorAll('#pr-campos input[data-campo]').forEach(inp => {
+    campos.push({ label: inp.dataset.campo, valor: inp.value });
+  });
+  const pr = {
+    id: getId('prontuarios'),
+    pacienteId: parseInt(document.getElementById('pr-pac').value),
+    medicoId: parseInt(document.getElementById('pr-med').value),
+    data: document.getElementById('pr-data').value,
+    queixa: document.getElementById('pr-queixa').value,
+    historico: document.getElementById('pr-hist').value,
+    exame: document.getElementById('pr-exame').value,
+    hipotese: document.getElementById('pr-hip').value,
+    conduta: document.getElementById('pr-conduta').value,
+    campos,
+  };
+  STATE.prontuarios.push(pr);
+  await dbSavePront(pr);
+  closeModal();
+}
+
+async function editProntuario(id) {
+  const pr = STATE.prontuarios.find(x=>x.id===id);
+  pr.queixa = document.getElementById('pr-v-queixa').innerText;
+  pr.historico = document.getElementById('pr-v-hist').innerText;
+  pr.exame = document.getElementById('pr-v-exame').innerText;
+  pr.hipotese = document.getElementById('pr-v-hip').innerText;
+  pr.conduta = document.getElementById('pr-v-conduta').innerText;
+  await sb.from('prontuarios').update({
+    queixa: pr.queixa, historico: pr.historico, exame: pr.exame,
+    hipotese: pr.hipotese, conduta: pr.conduta
+  }).eq('id', id);
+  closeModal();
+}
+
+async function saveUsuario(id) {
+  const perfil = document.getElementById('us-perfil').value;
+  const unidadesSel = perfil === 'supervisor' ? [] :
+    Array.from(document.querySelectorAll('[id^="un-check-"]:checked')).map(el => parseInt(el.value));
+  const obj = {
+    nome: document.getElementById('us-nome').value,
+    email: document.getElementById('us-email').value,
+    perfil,
+    ativo: true,
+    unidades: unidadesSel,
+  };
+  const senha = document.getElementById('us-senha').value;
+  if (senha) obj.senha = senha;
+  if (id) {
+    const i = STATE.users.findIndex(u=>u.id===id);
+    const updated = {...STATE.users[i],...obj, _dbId: id};
+    STATE.users[i] = updated;
+    await dbSaveUser(updated);
+  } else {
+    const novo = {id: getId('users'), senha: senha || '123456', ...obj};
+    STATE.users.push(novo);
+    await dbSaveUser(novo);
+  }
+  closeModal();
+}
+
+async function saveUnidade(id) {
+  const nome = document.getElementById('un-nome').value.trim();
+  const end = document.getElementById('un-end').value.trim();
+  if (!nome) { alert('Informe o nome da unidade.'); return; }
+  if (id) {
+    const i = STATE.unidades.findIndex(u=>u.id===id);
+    STATE.unidades[i] = {...STATE.unidades[i], nome, endereco: end};
+    await sb.from('unidades').update({ nome, endereco: end }).eq('id', id);
+  } else {
+    const obj = { nome, endereco: end, ativo: true };
+    const {data} = await sb.from('unidades').insert(obj).select();
+    if (data?.[0]) obj.id = data[0].id;
+    else obj.id = getId('unidades')||Date.now();
+    STATE.unidades.push(obj);
+  }
+  closeModal();
+}
+
+async function toggleUnidade(id) {
+  const un = STATE.unidades.find(x=>x.id===id);
+  un.ativo = !un.ativo;
+  await sb.from('unidades').update({ ativo: un.ativo }).eq('id', id);
+  render();
+}
+
+function toggleUnidadesPerfil(perfil) {
+  const sec = document.getElementById('sec-unidades-user');
+  if (sec) sec.style.display = perfil === 'supervisor' ? 'none' : '';
+}
+
+async function toggleUser(id) {
+  const u = STATE.users.find(x=>x.id===id);
+  u.ativo = !u.ativo;
+  await sb.from('usuarios').update({ ativo: u.ativo }).eq('id', id);
+  render();
+}
+
+function toggleTabPac(modo) {
+  const secEx = document.getElementById('sec-pac-existente');
+  const secNv = document.getElementById('sec-pac-novo');
+  const tabEx = document.getElementById('tab-pac-existente');
+  const tabNv = document.getElementById('tab-pac-novo');
+  if (!secEx) return;
+  if (modo === 'novo') {
+    secEx.style.display = 'none'; secNv.style.display = '';
+    tabEx.classList.remove('active'); tabNv.classList.add('active');
+  } else {
+    secEx.style.display = ''; secNv.style.display = 'none';
+    tabNv.classList.remove('active'); tabEx.classList.add('active');
+  }
+}
+
+function attachEvents() {
+  // Campo select custom
+  const sel = document.getElementById('pr-campo-sel');
+  const custom = document.getElementById('pr-campo-custom');
+  if (sel && custom) {
+    sel.onchange = () => { custom.style.display = sel.value === '__outro__' ? '' : 'none'; };
+  }
+}
+
+// ===== SVG ICONS =====
+function svgCross() { return `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2zm-4 10h-2v2a1 1 0 01-2 0v-2H9a1 1 0 010-2h2V9a1 1 0 012 0v2h2a1 1 0 010 2z"/></svg>`; }
+function svgHome() { return `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>`; }
+function svgCalendar() { return `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>`; }
+function svgClock() { return `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg>`; }
+function svgDoctor() { return `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C9.24 2 7 4.24 7 7v2H4l-1 13h18l-1-13h-3V7c0-2.76-2.24-5-5-5zm0 2c1.65 0 3 1.35 3 3v2H9V7c0-1.65 1.35-3 3-3zm-1 9h2v2h2v2h-2v2h-2v-2H9v-2h2v-2z"/></svg>`; }
+function svgPeople() { return `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>`; }
+function svgFile() { return `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>`; }
+function svgMoney() { return `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>`; }
+function svgReport() { return `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg>`; }
+function svgUsers() { return `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>`; }
+function svgBuilding() { return `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"/></svg>`; }
+
+// ===== INIT =====
+(async () => {
+  // Mostrar loading
+  document.getElementById('app').innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;gap:16px;font-family:'DM Sans',sans-serif">
+      <div style="width:44px;height:44px;background:#639922;border-radius:10px;display:flex;align-items:center;justify-content:center">
+        <svg viewBox="0 0 24 24" fill="white" width="24" height="24"><path d="M19 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2zm-4 10h-2v2a1 1 0 01-2 0v-2H9a1 1 0 010-2h2V9a1 1 0 012 0v2h2a1 1 0 010 2z"/></svg>
+      </div>
+      <div style="font-size:16px;color:#5A6050">Carregando HemoLab...</div>
+    </div>`;
+  await dbLoad();
+  render();
+})();
+
+</script>
+
+</body>
+</html>
 
